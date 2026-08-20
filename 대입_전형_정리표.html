@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대입 전형 정리표 — 나의 지원 전략</title>
+<style>
+  :root{
+    --paper:#f4efe4; --paper-line:#d9cfb8; --ink:#1e2a3a; --ink-soft:#4a5568;
+    --navy:#233350; --navy-deep:#141f33; --seal:#9b2c2c; --seal-soft:#c05656; --gold:#b08d3e;
+    --card:#fffdf7; --shadow:0 2px 8px rgba(30,42,58,0.12);
+    --green:#2f7a4d; --green-bg:#e5f3ea; --amber:#b3801a; --amber-bg:#fbf1dc;
+    --red:#b3392f; --red-bg:#f8e6e3; --gray:#8a94a6; --gray-bg:#eceff3;
+    font-family:'Noto Serif KR','Georgia',serif;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 250px, var(--paper) 250px);
+    color:var(--ink); font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif; min-height:100vh; }
+  header{ padding:24px 32px 18px; color:#f4efe4; }
+  header .eyebrow{ font-family:'Noto Serif KR',serif; letter-spacing:.35em; font-size:11px; color:var(--gold); text-transform:uppercase; margin-bottom:6px; }
+  .headtop{ display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; }
+  header h1{ font-family:'Noto Serif KR',serif; font-size:26px; margin:0 0 4px; font-weight:700; }
+  header p{ margin:0; font-size:13px; color:#c9d2e0; }
+  .toolbar{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center; }
+  button, .btn{ font-family:inherit; font-size:12.5px; border:1px solid rgba(244,239,228,0.35);
+    background:rgba(244,239,228,0.08); color:#f4efe4; padding:8px 14px; border-radius:5px; cursor:pointer; transition:.15s; }
+  button:hover{background:rgba(244,239,228,0.2);}
+  button.primary{ background:var(--gold); border-color:var(--gold); color:#1e1608; font-weight:600; }
+  button.primary:hover{background:#c49f4c;}
+  button.danger{border-color:rgba(192,86,86,.6); color:#f3c6c6;}
+  button.danger:hover{background:rgba(192,86,86,.25);}
+  button.nav-link{ background:var(--navy-deep); border-color:#3a4a68; color:#fff; font-weight:600; }
+  button.active-tab{ background:var(--gold); color:#1e1608; border-color:var(--gold); font-weight:700; }
+
+  .authbar{ display:flex; align-items:center; gap:10px; font-size:12px; color:#dfe6f2; background:rgba(0,0,0,.18); padding:8px 12px; border-radius:20px; }
+  .authbar .dot{width:8px;height:8px;border-radius:50%; background:#888;}
+  .authbar .dot.on{background:#57c26a;}
+  .authbar input{ border:1px solid rgba(255,255,255,.3); background:rgba(255,255,255,.08); color:#fff; padding:5px 8px; border-radius:4px; font-size:12px; width:130px;}
+  .savebar{ display:flex; align-items:center; gap:8px; font-size:11.5px; color:#c9d2e0; margin-top:8px; flex-wrap:wrap; }
+  .savebar .pill{ background:rgba(244,239,228,0.1); padding:4px 10px; border-radius:12px; }
+
+  .tabs{ display:flex; gap:8px; margin-top:12px; }
+
+  .content-wrap{ padding:20px 32px 80px; }
+
+  /* ---- list view ---- */
+  .filters{ display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; font-size:12.5px; color:var(--ink-soft);}
+  .filters select{ padding:6px 8px; border-radius:5px; border:1px solid var(--paper-line); font-family:inherit; background:var(--card); }
+
+  .uni-group{ margin-bottom:22px; }
+  .uni-group h2{ font-family:'Noto Serif KR',serif; font-size:18px; color:var(--navy-deep); margin:0 0 8px;
+    border-bottom:2px solid var(--navy-deep); padding-bottom:4px; display:flex; align-items:center; gap:8px;}
+  .uni-group h2 .count{ font-size:11px; color:var(--ink-soft); font-weight:400; }
+
+  .cards-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; }
+  .adm-card{ background:var(--card); border:1px solid var(--paper-line); border-radius:8px; padding:14px 16px;
+    box-shadow:var(--shadow); cursor:pointer; position:relative; border-left:6px solid var(--gray); transition:.15s; }
+  .adm-card:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.12); }
+  .adm-card.prob-상{ border-left-color:var(--green); }
+  .adm-card.prob-중{ border-left-color:var(--amber); }
+  .adm-card.prob-하{ border-left-color:var(--red); }
+  .adm-card .badge{ display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:10px; margin-bottom:6px; }
+  .badge.prob-상{ background:var(--green-bg); color:var(--green); }
+  .badge.prob-중{ background:var(--amber-bg); color:var(--amber); }
+  .badge.prob-하{ background:var(--red-bg); color:var(--red); }
+  .badge.prob-미정{ background:var(--gray-bg); color:var(--gray); }
+  .adm-card .type{ font-size:11px; color:var(--ink-soft); margin-bottom:2px; }
+  .adm-card .dept{ font-size:15px; font-weight:700; color:var(--navy-deep); margin-bottom:6px; }
+  .adm-card .metaline{ font-size:11px; color:var(--ink-soft); display:flex; flex-wrap:wrap; gap:6px 10px; margin-top:8px; }
+  .adm-card .metaline span{ background:#f3ede0; padding:2px 7px; border-radius:4px; }
+  .adm-card .cardtag{ position:absolute; top:12px; right:12px; font-size:10px; color:var(--seal); font-weight:700; }
+
+  .empty-note{padding:40px; text-align:center; color:var(--ink-soft); font-size:13px; background:var(--card); border-radius:8px; border:1px solid var(--paper-line); }
+
+  /* ---- calendar view ---- */
+  .cal-wrap{ background:var(--card); border:1px solid var(--paper-line); border-radius:8px; box-shadow:var(--shadow); padding:18px; }
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .cal-head h2{ font-family:'Noto Serif KR',serif; font-size:18px; color:var(--navy-deep); margin:0; }
+  .cal-nav{ display:flex; gap:6px; }
+  .cal-nav button{ color:var(--navy-deep); border:1px solid var(--paper-line); background:#fff; }
+  .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; }
+  .cal-dow{ text-align:center; font-size:11px; color:var(--ink-soft); font-weight:700; padding:4px 0; }
+  .cal-day{ min-height:86px; border:1px solid var(--paper-line); border-radius:6px; padding:6px; font-size:11px; background:#fffef9; position:relative; }
+  .cal-day.other-month{ background:#f4efe4; opacity:.5; }
+  .cal-day .num{ font-weight:700; color:var(--navy-deep); font-size:12px; margin-bottom:4px; }
+  .cal-event{ font-size:10px; padding:2px 5px; border-radius:4px; margin-bottom:3px; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cal-event.prob-상{ background:var(--green-bg); color:var(--green); }
+  .cal-event.prob-중{ background:var(--amber-bg); color:var(--amber); }
+  .cal-event.prob-하{ background:var(--red-bg); color:var(--red); }
+  .cal-event.prob-미정{ background:var(--gray-bg); color:var(--gray); }
+  .cal-event.type-announce{ border-left:3px solid var(--navy); }
+  .cal-event.type-interview{ border-left:3px solid var(--seal); }
+
+  /* ---- modal ---- */
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(20,31,51,0.55); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal-backdrop.open{display:flex;}
+  .modal{ background:var(--card); width:min(680px, 100%); max-height:90vh; overflow-y:auto; border-radius:8px; box-shadow:0 12px 40px rgba(0,0,0,.35); padding:22px 24px 24px; }
+  .modal h2{margin:0 0 4px; font-family:'Noto Serif KR',serif; font-size:19px; color:var(--navy-deep);}
+  .modal .sub{font-size:11.5px; color:var(--ink-soft); margin-bottom:16px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12px; font-weight:700; color:var(--navy); margin-bottom:5px;}
+  .field input[type=text], .field input[type=date], .field input[type=time], .field textarea, .field select{
+    width:100%; padding:8px 10px; border:1px solid var(--paper-line); border-radius:5px; font-family:inherit; font-size:13px; background:#fffef9; color:var(--ink); }
+  .field textarea{min-height:56px; resize:vertical;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+  .checkline{display:flex; align-items:center; gap:8px; font-size:12.5px;}
+  .chip-toggle-group{display:flex; flex-wrap:wrap; gap:6px;}
+  .chip-toggle{ font-size:11.5px; background:#e6ecf5; color:var(--navy); border:1px solid #c7d3e6; padding:5px 10px; border-radius:12px; cursor:pointer; }
+  .chip-toggle.active{background:var(--navy); color:#fff;}
+  .q-item{ display:flex; gap:6px; margin-bottom:6px; }
+  .q-item textarea{ flex:1; min-height:40px; }
+  .x-btn{background:none;border:none;color:var(--seal);cursor:pointer;font-size:14px;padding:0 6px;}
+  .prob-select{ display:flex; gap:8px; }
+  .prob-opt{ flex:1; text-align:center; padding:8px; border-radius:6px; border:2px solid var(--paper-line); cursor:pointer; font-size:12.5px; font-weight:700; color:var(--ink-soft);}
+  .prob-opt.sel-상.selected{ border-color:var(--green); background:var(--green-bg); color:var(--green); }
+  .prob-opt.sel-중.selected{ border-color:var(--amber); background:var(--amber-bg); color:var(--amber); }
+  .prob-opt.sel-하.selected{ border-color:var(--red); background:var(--red-bg); color:var(--red); }
+  .prob-opt.sel-미정.selected{ border-color:var(--gray); background:var(--gray-bg); color:var(--gray); }
+  .modal-actions{display:flex; justify-content:space-between; margin-top:18px; gap:8px;}
+  .modal-actions .left{display:flex; gap:8px;}
+  button.ghost{background:transparent; border:1px solid var(--paper-line); color:var(--ink-soft);}
+  button.ghost:hover{background:#f3ede0;}
+  small.hint{color:var(--ink-soft); font-size:11px; display:block; margin-top:4px;}
+
+  footer{text-align:center; font-size:11px; color:var(--ink-soft); padding:20px;}
+  .save-indicator{ position:fixed; bottom:16px; right:16px; background:var(--navy); color:#f4efe4; font-size:11.5px;
+    padding:8px 14px; border-radius:20px; opacity:0; transition:opacity .3s; box-shadow:var(--shadow); z-index:60; }
+  .save-indicator.show{opacity:1;}
+  .save-indicator.error{background:var(--seal);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="headtop">
+    <div>
+      <div class="eyebrow">ADMISSIONS STRATEGY BOARD</div>
+      <h1>나의 대입 전형 정리표</h1>
+      <p>대학 · 전형 · 학과별 상세 정보를 한눈에, 캘린더로 일정까지 관리</p>
+    </div>
+    <div class="authbar" id="authbar">
+      <span class="dot" id="authDot"></span>
+      <span id="authStatus">연결 확인 중...</span>
+      <input type="email" id="authEmail" placeholder="이메일">
+      <input type="password" id="authPw" placeholder="비밀번호">
+      <button id="loginBtn">로그인</button>
+      <button id="signupBtn">회원가입</button>
+      <button id="logoutBtn" style="display:none;">로그아웃</button>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button class="primary" id="addAdmBtn">➕ 대학/전형 추가</button>
+    <button id="loadSampleBtn">🧪 예시 데이터로 미리보기</button>
+    <button id="exportBtn">💾 백업 파일 다운로드 (JSON)</button>
+    <label class="btn" style="display:inline-flex;align-items:center;">
+      📂 백업 파일 불러오기
+      <input type="file" id="importInput" accept="application/json" style="display:none;">
+    </label>
+    <button class="danger" id="clearBtn">🗑 전체 초기화</button>
+    <button class="nav-link" id="goLedgerBtn">📖 생기부 이력표로 돌아가기 ←</button>
+  </div>
+  <div class="tabs">
+    <button id="tabList" class="active-tab">📋 목록 보기</button>
+    <button id="tabCal">🗓 캘린더 보기</button>
+  </div>
+  <div class="savebar">
+    <span class="pill" id="saveTimestamp">아직 저장 기록 없음</span>
+    <span class="pill" id="cloudStatus">☁️ 클라우드: 미설정</span>
+  </div>
+</header>
+
+<div class="content-wrap">
+
+  <div id="listView">
+    <div class="filters">
+      <span>정렬:</span>
+      <select id="sortSelect">
+        <option value="prob">합격 가능성 높은 순</option>
+        <option value="uni">대학 이름순</option>
+        <option value="date">면접/발표일 순</option>
+      </select>
+      <span>· 카드를 클릭하면 상세 정보를 편집할 수 있습니다.</span>
+    </div>
+    <div id="listContainer"></div>
+  </div>
+
+  <div id="calView" style="display:none;">
+    <div class="cal-wrap">
+      <div class="cal-head">
+        <div class="cal-nav"><button id="calPrev">◀</button></div>
+        <h2 id="calTitle"></h2>
+        <div class="cal-nav"><button id="calNext">▶</button></div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>로그인하면 데이터가 Firebase 클라우드에 저장되어 어떤 기기에서든 이어서 볼 수 있습니다. "생기부 이력표"와 같은 Firebase 계정으로 로그인하면 두 사이트가 같은 로그인 정보를 공유합니다 (데이터는 각 사이트별로 별도 저장됩니다).</footer>
+
+<!-- Entry Modal -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <h2 id="modalTitle">대학 / 전형 입력</h2>
+    <div class="sub">대학, 전형, 학과 단위로 하나씩 등록합니다. 같은 대학의 다른 전형/학과는 각각 따로 추가해주세요.</div>
+
+    <div class="row3">
+      <div class="field"><label>대학교</label><input type="text" id="f_uni" placeholder="예: 한국대학교"></div>
+      <div class="field"><label>전형 이름</label><input type="text" id="f_type" placeholder="예: 학생부종합(네오르네상스)"></div>
+      <div class="field"><label>지원 학과</label><input type="text" id="f_dept" placeholder="예: 경영학과"></div>
+    </div>
+
+    <div class="field checkline"><input type="checkbox" id="f_iscard"><label for="f_iscard" style="margin:0;">6장 지원 카드에 포함된 학교입니다 (미포함 시 특수 전형/추가 지원)</label></div>
+
+    <div class="row2">
+      <div class="field"><label>1차 서류 합격 배수</label><input type="text" id="f_round1" placeholder="예: 3배수"></div>
+      <div class="field"><label>면접 응시 배수</label><input type="text" id="f_ivratio" placeholder="예: 3배수"></div>
+    </div>
+
+    <div class="field checkline"><input type="checkbox" id="f_ivrequired"><label for="f_ivrequired" style="margin:0;">면접이 있습니다</label></div>
+    <div class="row3">
+      <div class="field"><label>면접 날짜</label><input type="date" id="f_ivdate"></div>
+      <div class="field"><label>면접 시간</label><input type="time" id="f_ivtime"></div>
+      <div class="field"><label>최종 발표일</label><input type="date" id="f_announce"></div>
+    </div>
+
+    <div class="field">
+      <label>면접 유형</label>
+      <div class="chip-toggle-group" id="ivTypeGroup">
+        <div class="chip-toggle" data-v="제시문 기반">제시문 기반</div>
+        <div class="chip-toggle" data-v="생기부 기반">생기부 기반</div>
+        <div class="chip-toggle" data-v="특수(영어면접 등)">특수(영어면접 등)</div>
+      </div>
+    </div>
+
+    <div class="row3">
+      <div class="field checkline"><input type="checkbox" id="f_choi"><label for="f_choi" style="margin:0;">수능 최저 있음</label></div>
+      <div class="field checkline"><input type="checkbox" id="f_rec"><label for="f_rec" style="margin:0;">추천서 필요</label></div>
+      <div class="field checkline"><input type="checkbox" id="f_selfintro"><label for="f_selfintro" style="margin:0;">자기소개서 필요</label></div>
+    </div>
+    <div class="field"><label>수능 최저 기준 (해당 시)</label><input type="text" id="f_choitext" placeholder="예: 국,수,영,탐 중 2개 합 5 이내"></div>
+
+    <div class="field" id="selfIntroBlock">
+      <label>자소서 문항</label>
+      <div id="qList"></div>
+      <button class="ghost" id="addQBtn" type="button">+ 문항 추가</button>
+    </div>
+
+    <div class="field"><label>작년 입시결과 / 수시컷 참고 (선택)</label><input type="text" id="f_cutoff" placeholder="예: 작년 최종등록 평균 2.3등급, 경쟁률 8:1"></div>
+
+    <div class="field">
+      <label>합격 가능성 (내 판단)</label>
+      <div class="prob-select">
+        <div class="prob-opt sel-상" data-v="상">상 (가능성 높음)</div>
+        <div class="prob-opt sel-중" data-v="중">중 (도전권)</div>
+        <div class="prob-opt sel-하" data-v="하">하 (소신/상향)</div>
+        <div class="prob-opt sel-미정" data-v="미정">미정</div>
+      </div>
+    </div>
+
+    <div class="field"><label>메모</label><textarea id="f_memo" placeholder="전략 메모, 준비할 것, 특이사항 등"></textarea></div>
+
+    <div class="modal-actions">
+      <div class="left"><button class="danger" id="deleteAdmBtn">삭제</button></div>
+      <div class="left"><button class="ghost" id="cancelBtn">취소</button><button class="primary" id="saveAdmBtn">저장</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="save-indicator" id="saveIndicator">저장됨</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="./firebase-config.js"></script>
+<script>
+const STORAGE_KEY = 'admissions_board_v1';
+let state = loadLocal() || { admissions: {}, lastSaved: null };
+let editingId = null;
+let tempIvTypes = [], tempQuestions = [], tempProb = '미정';
+let currentView = 'list';
+let calYear, calMonth; // 0-indexed month
+
+function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- Firebase ---------- */
+let fbAuth=null, fbDb=null, currentUser=null, cloudReady=false;
+try{
+  if(firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('여기에')){
+    firebase.initializeApp(firebaseConfig);
+    fbAuth = firebase.auth(); fbDb = firebase.firestore(); cloudReady = true;
+    document.getElementById('cloudStatus').textContent = '☁️ 클라우드: 연결됨';
+  }else{
+    document.getElementById('cloudStatus').textContent = '☁️ 클라우드: 설정 안 됨';
+    document.getElementById('authStatus').textContent = '클라우드 미설정 (로컬 저장만 사용)';
+  }
+}catch(e){ document.getElementById('cloudStatus').textContent='☁️ 클라우드: 연결 실패'; console.error(e); }
+
+if(cloudReady){
+  fbAuth.onAuthStateChanged(async (user)=>{
+    currentUser = user;
+    const dot = document.getElementById('authDot');
+    if(user){
+      dot.classList.add('on');
+      document.getElementById('authStatus').textContent = user.email;
+      document.getElementById('loginBtn').style.display='none';
+      document.getElementById('signupBtn').style.display='none';
+      document.getElementById('logoutBtn').style.display='inline-block';
+      document.getElementById('authEmail').style.display='none';
+      document.getElementById('authPw').style.display='none';
+      await loadFromCloud();
+    }else{
+      dot.classList.remove('on');
+      document.getElementById('authStatus').textContent = '로그인 안 함 (로컬에만 저장됨)';
+      document.getElementById('loginBtn').style.display='inline-block';
+      document.getElementById('signupBtn').style.display='inline-block';
+      document.getElementById('logoutBtn').style.display='none';
+      document.getElementById('authEmail').style.display='inline-block';
+      document.getElementById('authPw').style.display='inline-block';
+      renderAll();
+    }
+  });
+  document.getElementById('loginBtn').addEventListener('click', async ()=>{
+    const email=document.getElementById('authEmail').value.trim(), pw=document.getElementById('authPw').value;
+    if(!email||!pw) return alert('이메일/비밀번호를 입력하세요.');
+    try{ await fbAuth.signInWithEmailAndPassword(email, pw); }catch(e){ alert('로그인 실패: '+e.message); }
+  });
+  document.getElementById('signupBtn').addEventListener('click', async ()=>{
+    const email=document.getElementById('authEmail').value.trim(), pw=document.getElementById('authPw').value;
+    if(!email||!pw) return alert('이메일/비밀번호를 입력하세요.');
+    if(pw.length<6) return alert('비밀번호는 6자 이상이어야 합니다.');
+    try{ await fbAuth.createUserWithEmailAndPassword(email, pw); alert('회원가입 완료!'); }catch(e){ alert('회원가입 실패: '+e.message); }
+  });
+  document.getElementById('logoutBtn').addEventListener('click', ()=> fbAuth.signOut());
+}else{
+  document.getElementById('authbar').style.display='none';
+}
+
+async function loadFromCloud(){
+  if(!cloudReady || !currentUser) return;
+  try{
+    const doc = await fbDb.collection('users').doc(currentUser.uid).collection('admissions').doc('main').get();
+    if(doc.exists){
+      const data = doc.data();
+      state = { admissions: data.admissions||{}, lastSaved: data.lastSaved||null };
+      saveLocal();
+    }else{ await saveToCloud(); }
+  }catch(e){ console.error(e); showIndicator('클라우드 불러오기 실패', true); }
+  renderAll();
+}
+async function saveToCloud(){
+  if(!cloudReady || !currentUser) return;
+  try{
+    await fbDb.collection('users').doc(currentUser.uid).collection('admissions').doc('main')
+      .set({ admissions: state.admissions, lastSaved: new Date().toISOString() });
+  }catch(e){ console.error(e); showIndicator('클라우드 저장 실패 (로컬에는 저장됨)', true); }
+}
+function saveLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function loadLocal(){ try{ const raw=localStorage.getItem(STORAGE_KEY); return raw?JSON.parse(raw):null; }catch(e){ return null; } }
+async function persist(){
+  state.lastSaved = new Date().toISOString();
+  saveLocal(); updateTimestamp(); showIndicator('저장됨');
+  await saveToCloud();
+}
+function updateTimestamp(){
+  const el = document.getElementById('saveTimestamp');
+  el.textContent = state.lastSaved ? '🕒 마지막 저장: ' + new Date(state.lastSaved).toLocaleString('ko-KR') : '아직 저장 기록 없음';
+}
+function showIndicator(msg, isError){
+  const ind = document.getElementById('saveIndicator');
+  ind.textContent = msg; ind.classList.toggle('error', !!isError); ind.classList.add('show');
+  clearTimeout(showIndicator._t); showIndicator._t = setTimeout(()=>ind.classList.remove('show'), 1600);
+}
+
+/* ---------- tabs ---------- */
+document.getElementById('tabList').addEventListener('click', ()=>{
+  currentView='list'; document.getElementById('listView').style.display='block'; document.getElementById('calView').style.display='none';
+  document.getElementById('tabList').classList.add('active-tab'); document.getElementById('tabCal').classList.remove('active-tab');
+});
+document.getElementById('tabCal').addEventListener('click', ()=>{
+  currentView='cal'; document.getElementById('listView').style.display='none'; document.getElementById('calView').style.display='block';
+  document.getElementById('tabCal').classList.add('active-tab'); document.getElementById('tabList').classList.remove('active-tab');
+  renderCalendar();
+});
+document.getElementById('goLedgerBtn').addEventListener('click', ()=> window.open('./생기부_정리표.html','_blank'));
+
+/* ---------- render list ---------- */
+const PROB_ORDER = {'상':0,'중':1,'하':2,'미정':3};
+
+function renderAll(){ renderList(); updateTimestamp(); if(currentView==='cal') renderCalendar(); }
+
+document.getElementById('sortSelect').addEventListener('change', renderList);
+
+function renderList(){
+  const container = document.getElementById('listContainer');
+  container.innerHTML = '';
+  const all = Object.values(state.admissions);
+  if(all.length === 0){
+    container.innerHTML = '<div class="empty-note">아직 등록된 대학/전형이 없습니다. "대학/전형 추가" 버튼을 누르거나 "예시 데이터로 미리보기"를 눌러보세요.</div>';
+    return;
+  }
+  const sortMode = document.getElementById('sortSelect').value;
+
+  // group by university
+  const byUni = {};
+  all.forEach(a=>{ (byUni[a.university] = byUni[a.university]||[]).push(a); });
+
+  let uniNames = Object.keys(byUni);
+  if(sortMode==='uni'){ uniNames.sort((a,b)=>a.localeCompare(b,'ko')); }
+  else{
+    // sort universities by their best (lowest) probability rank
+    uniNames.sort((a,b)=>{
+      const ra = Math.min(...byUni[a].map(x=>PROB_ORDER[x.probability||'미정']));
+      const rb = Math.min(...byUni[b].map(x=>PROB_ORDER[x.probability||'미정']));
+      return ra-rb;
+    });
+  }
+
+  uniNames.forEach(uniName=>{
+    let list = byUni[uniName].slice();
+    if(sortMode==='prob'){ list.sort((a,b)=>PROB_ORDER[a.probability||'미정']-PROB_ORDER[b.probability||'미정']); }
+    else if(sortMode==='date'){ list.sort((a,b)=> (a.interviewDate||a.announceDate||'9999').localeCompare(b.interviewDate||b.announceDate||'9999')); }
+
+    const group = document.createElement('div'); group.className='uni-group';
+    group.innerHTML = `<h2>${escapeHtml(uniName)} <span class="count">(${list.length}개 전형/학과)</span></h2>`;
+    const grid = document.createElement('div'); grid.className='cards-grid';
+
+    list.forEach(a=>{
+      const card = document.createElement('div');
+      card.className = 'adm-card prob-' + (a.probability||'미정');
+      let meta = [];
+      if(a.round1Ratio) meta.push('1차 '+a.round1Ratio);
+      if(a.interviewRequired) meta.push('면접 '+(a.interviewRatio||'배수 미정'));
+      if(a.interviewDate) meta.push('면접일 '+a.interviewDate);
+      if(a.announceDate) meta.push('발표 '+a.announceDate);
+      if(a.suneungChoi) meta.push('수능최저 O');
+      if(a.recommendation) meta.push('추천서 O');
+      if(a.selfIntroRequired) meta.push('자소서 O');
+      card.innerHTML = `
+        ${a.isCardSchool ? '<div class="cardtag">6장 카드</div>' : '<div class="cardtag" style="color:var(--ink-soft);">추가 지원</div>'}
+        <span class="badge prob-${a.probability||'미정'}">${a.probability||'미정'}</span>
+        <div class="type">${escapeHtml(a.admissionType||'전형명 미입력')}</div>
+        <div class="dept">${escapeHtml(a.department||'학과 미입력')}</div>
+        <div class="metaline">${meta.map(m=>`<span>${escapeHtml(m)}</span>`).join('')}</div>
+      `;
+      card.addEventListener('click', ()=> openModal(a.id));
+      grid.appendChild(card);
+    });
+    group.appendChild(grid);
+    container.appendChild(group);
+  });
+}
+
+/* ---------- calendar ---------- */
+function renderCalendar(){
+  if(calYear===undefined){ const now=new Date(); calYear=now.getFullYear(); calMonth=now.getMonth(); }
+  document.getElementById('calTitle').textContent = `${calYear}년 ${calMonth+1}월`;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  ['일','월','화','수','목','금','토'].forEach(d=>{
+    const el = document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el);
+  });
+
+  const firstDay = new Date(calYear, calMonth, 1);
+  const startWeekday = firstDay.getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const daysInPrevMonth = new Date(calYear, calMonth, 0).getDate();
+
+  // build event map: dateStr -> [events]
+  const events = {};
+  Object.values(state.admissions).forEach(a=>{
+    if(a.interviewRequired && a.interviewDate){
+      (events[a.interviewDate] = events[a.interviewDate]||[]).push({label:`🎤 ${a.university} 면접`, prob:a.probability||'미정', type:'interview', id:a.id});
+    }
+    if(a.announceDate){
+      (events[a.announceDate] = events[a.announceDate]||[]).push({label:`📢 ${a.university} 발표`, prob:a.probability||'미정', type:'announce', id:a.id});
+    }
+  });
+
+  const totalCells = Math.ceil((startWeekday + daysInMonth) / 7) * 7;
+  for(let i=0;i<totalCells;i++){
+    const dayNum = i - startWeekday + 1;
+    const cell = document.createElement('div'); cell.className='cal-day';
+    let realDate, label;
+    if(dayNum < 1){ realDate = new Date(calYear, calMonth-1, daysInPrevMonth+dayNum); cell.classList.add('other-month'); }
+    else if(dayNum > daysInMonth){ realDate = new Date(calYear, calMonth+1, dayNum-daysInMonth); cell.classList.add('other-month'); }
+    else{ realDate = new Date(calYear, calMonth, dayNum); }
+    const dateStr = realDate.toISOString().slice(0,10);
+    cell.innerHTML = `<div class="num">${realDate.getDate()}</div>`;
+    (events[dateStr]||[]).forEach(ev=>{
+      const evEl = document.createElement('div');
+      evEl.className = `cal-event prob-${ev.prob} type-${ev.type}`;
+      evEl.textContent = ev.label;
+      evEl.title = ev.label;
+      evEl.addEventListener('click', ()=> openModal(ev.id));
+      cell.appendChild(evEl);
+    });
+    grid.appendChild(cell);
+  }
+}
+document.getElementById('calPrev').addEventListener('click', ()=>{ calMonth--; if(calMonth<0){calMonth=11; calYear--;} renderCalendar(); });
+document.getElementById('calNext').addEventListener('click', ()=>{ calMonth++; if(calMonth>11){calMonth=0; calYear++;} renderCalendar(); });
+
+/* ---------- modal ---------- */
+function openModal(id){
+  editingId = id;
+  document.getElementById('modalBackdrop').classList.add('open');
+  let a;
+  if(id){ a = state.admissions[id]; document.getElementById('modalTitle').textContent='대학 / 전형 편집'; document.getElementById('deleteAdmBtn').style.display='inline-block'; }
+  else{ a = { university:'', admissionType:'', department:'', isCardSchool:true, round1Ratio:'', interviewRatio:'',
+    interviewRequired:false, interviewDate:'', interviewTime:'', announceDate:'', interviewTypes:[],
+    suneungChoi:false, suneungChoiText:'', recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
+    cutoffNote:'', probability:'미정', memo:'' };
+    document.getElementById('modalTitle').textContent='새 대학 / 전형 입력'; document.getElementById('deleteAdmBtn').style.display='none'; }
+
+  document.getElementById('f_uni').value = a.university||'';
+  document.getElementById('f_type').value = a.admissionType||'';
+  document.getElementById('f_dept').value = a.department||'';
+  document.getElementById('f_iscard').checked = a.isCardSchool!==false;
+  document.getElementById('f_round1').value = a.round1Ratio||'';
+  document.getElementById('f_ivratio').value = a.interviewRatio||'';
+  document.getElementById('f_ivrequired').checked = !!a.interviewRequired;
+  document.getElementById('f_ivdate').value = a.interviewDate||'';
+  document.getElementById('f_ivtime').value = a.interviewTime||'';
+  document.getElementById('f_announce').value = a.announceDate||'';
+  document.getElementById('f_choi').checked = !!a.suneungChoi;
+  document.getElementById('f_choitext').value = a.suneungChoiText||'';
+  document.getElementById('f_rec').checked = !!a.recommendation;
+  document.getElementById('f_selfintro').checked = !!a.selfIntroRequired;
+  document.getElementById('f_cutoff').value = a.cutoffNote||'';
+  document.getElementById('f_memo').value = a.memo||'';
+
+  tempIvTypes = (a.interviewTypes||[]).slice();
+  tempQuestions = (a.selfIntroQuestions||[]).slice();
+  tempProb = a.probability || '미정';
+
+  document.querySelectorAll('#ivTypeGroup .chip-toggle').forEach(chip=>{
+    chip.classList.toggle('active', tempIvTypes.includes(chip.dataset.v));
+  });
+  document.querySelectorAll('.prob-opt').forEach(opt=>{
+    opt.classList.toggle('selected', opt.dataset.v === tempProb);
+  });
+
+  renderQList();
+}
+function closeModal(){ document.getElementById('modalBackdrop').classList.remove('open'); editingId=null; }
+document.getElementById('cancelBtn').addEventListener('click', closeModal);
+document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='modalBackdrop') closeModal(); });
+
+document.querySelectorAll('#ivTypeGroup .chip-toggle').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    const v = chip.dataset.v; const i = tempIvTypes.indexOf(v);
+    if(i>=0) tempIvTypes.splice(i,1); else tempIvTypes.push(v);
+    chip.classList.toggle('active');
+  });
+});
+document.querySelectorAll('.prob-opt').forEach(opt=>{
+  opt.addEventListener('click', ()=>{
+    tempProb = opt.dataset.v;
+    document.querySelectorAll('.prob-opt').forEach(o=> o.classList.toggle('selected', o===opt));
+  });
+});
+
+function renderQList(){
+  const list = document.getElementById('qList'); list.innerHTML='';
+  tempQuestions.forEach((q, idx)=>{
+    const row = document.createElement('div'); row.className='q-item';
+    const ta = document.createElement('textarea'); ta.value = q; ta.placeholder = `문항 ${idx+1}`;
+    ta.addEventListener('input', ()=>{ tempQuestions[idx] = ta.value; });
+    const x = document.createElement('button'); x.className='x-btn'; x.textContent='✕';
+    x.addEventListener('click', ()=>{ tempQuestions.splice(idx,1); renderQList(); });
+    row.appendChild(ta); row.appendChild(x); list.appendChild(row);
+  });
+}
+document.getElementById('addQBtn').addEventListener('click', ()=>{ tempQuestions.push(''); renderQList(); });
+
+document.getElementById('saveAdmBtn').addEventListener('click', ()=>{
+  const university = document.getElementById('f_uni').value.trim();
+  const admissionType = document.getElementById('f_type').value.trim();
+  const department = document.getElementById('f_dept').value.trim();
+  if(!university || !admissionType || !department){ alert('대학교, 전형 이름, 지원 학과는 필수입니다.'); return; }
+
+  const id = editingId || uid('adm');
+  state.admissions[id] = {
+    id, university, admissionType, department,
+    isCardSchool: document.getElementById('f_iscard').checked,
+    round1Ratio: document.getElementById('f_round1').value.trim(),
+    interviewRatio: document.getElementById('f_ivratio').value.trim(),
+    interviewRequired: document.getElementById('f_ivrequired').checked,
+    interviewDate: document.getElementById('f_ivdate').value,
+    interviewTime: document.getElementById('f_ivtime').value,
+    announceDate: document.getElementById('f_announce').value,
+    interviewTypes: tempIvTypes,
+    suneungChoi: document.getElementById('f_choi').checked,
+    suneungChoiText: document.getElementById('f_choitext').value.trim(),
+    recommendation: document.getElementById('f_rec').checked,
+    selfIntroRequired: document.getElementById('f_selfintro').checked,
+    selfIntroQuestions: tempQuestions.filter(q=>q.trim()),
+    cutoffNote: document.getElementById('f_cutoff').value.trim(),
+    probability: tempProb,
+    memo: document.getElementById('f_memo').value.trim(),
+  };
+  persist(); closeModal(); renderAll();
+});
+document.getElementById('deleteAdmBtn').addEventListener('click', ()=>{
+  if(!editingId) return; if(!confirm('이 항목을 삭제할까요?')) return;
+  delete state.admissions[editingId]; persist(); closeModal(); renderAll();
+});
+document.getElementById('addAdmBtn').addEventListener('click', ()=> openModal(null));
+
+/* ---------- import/export ---------- */
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href = url; a.download = `대입_전형_정리표_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
+});
+document.getElementById('importInput').addEventListener('change', (e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(!data.admissions) throw new Error('형식 오류');
+      if(confirm('현재 데이터를 덮어쓰고 불러올까요?')){ state = data; persist(); renderAll(); }
+    }catch(err){ alert('파일을 읽는 중 오류가 발생했습니다.'); }
+  };
+  reader.readAsText(file); e.target.value='';
+});
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  if(confirm('정말 모든 데이터를 삭제할까요? 이 작업은 되돌릴 수 없습니다.')){ state = {admissions:{}, lastSaved:null}; persist(); renderAll(); }
+});
+
+/* ---------- sample data ---------- */
+function loadSample(){
+  if(Object.keys(state.admissions).length > 0 && !confirm('현재 데이터가 있습니다. 예시 데이터로 덮어쓸까요?')) return;
+  state.admissions = {};
+  const items = [
+    {university:'한국대학교', admissionType:'학생부종합(미래인재)', department:'경영학과', isCardSchool:true,
+     round1Ratio:'3배수', interviewRatio:'3배수', interviewRequired:true, interviewDate: nextDate(20), interviewTime:'10:00',
+     announceDate: nextDate(55), interviewTypes:['생기부 기반'], suneungChoi:false, suneungChoiText:'',
+     recommendation:false, selfIntroRequired:true, selfIntroQuestions:['고교 재학 중 가장 의미 있었던 학업 경험을 서술하시오.','지원 동기와 진학 후 학업 계획을 서술하시오.'],
+     cutoffNote:'작년 최종등록 평균 2.1등급', probability:'중', memo:'전공적합성 강조 필요'},
+    {university:'한국대학교', admissionType:'논술전형', department:'경제학과', isCardSchool:true,
+     round1Ratio:'-', interviewRatio:'', interviewRequired:false, interviewDate:'', interviewTime:'',
+     announceDate: nextDate(60), interviewTypes:[], suneungChoi:true, suneungChoiText:'국,수,영,탐 중 3개 합 6 이내',
+     recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
+     cutoffNote:'논술 경쟁률 40:1', probability:'하', memo:'수능 최저 충족 여부 우선 확인'},
+    {university:'서울미래대학교', admissionType:'학생부교과(지역균형)', department:'컴퓨터공학과', isCardSchool:true,
+     round1Ratio:'5배수', interviewRatio:'없음', interviewRequired:false, interviewDate:'', interviewTime:'',
+     announceDate: nextDate(50), interviewTypes:[], suneungChoi:true, suneungChoiText:'국,수,영,과 중 2개 합 4 이내',
+     recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
+     cutoffNote:'작년 컷 1.6등급', probability:'상', memo:'교과 성적 안정권'},
+    {university:'서울미래대학교', admissionType:'학생부종합(창의인재)', department:'소프트웨어학과', isCardSchool:false,
+     round1Ratio:'4배수', interviewRatio:'4배수', interviewRequired:true, interviewDate: nextDate(25), interviewTime:'14:30',
+     announceDate: nextDate(58), interviewTypes:['제시문 기반','특수(영어면접 등)'], suneungChoi:false, suneungChoiText:'',
+     recommendation:true, selfIntroRequired:true, selfIntroQuestions:['전공 관련 탐구 활동 중 대표 사례를 서술하시오.'],
+     cutoffNote:'특기자 전형 성격, 6장 카드 외 별도 지원', probability:'미정', memo:'영어 면접 준비 필요 - 스크립트 연습'},
+  ];
+  items.forEach(it=>{ const id = uid('adm'); state.admissions[id] = {id, ...it}; });
+  persist(); renderAll();
+}
+function nextDate(daysFromNow){
+  const d = new Date(); d.setDate(d.getDate()+daysFromNow); return d.toISOString().slice(0,10);
+}
+document.getElementById('loadSampleBtn').addEventListener('click', loadSample);
+
+renderAll();
+</script>
+</body>
+</html>
