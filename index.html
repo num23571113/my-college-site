@@ -236,22 +236,64 @@ document.getElementById('themeToggle').addEventListener('click', function(){
 });
 
 const CHANGELOG = [
-  { date:'2026.08.21', tag:'new', title:'메인 사이트 개편', desc:'다크모드, 업데이트 로그, 대학 검색창을 추가했습니다.' },
-  { date:'2026.08.20', tag:'improve', title:'Firebase 계정 연동 변경', desc:'구글 계정 기반 클라우드 저장 방식으로 전환했습니다.' },
-  { date:'2026.08.18', tag:'new', title:'생기부 이력표 최초 배포', desc:'학기 × 과목별 활동 정리 기능을 오픈했습니다.' },
+  {
+    version: 'ver.2.1',
+    date: '2026.08.21',
+    items: [
+      { text: '데이터 대입 전형 정리표 및 생기부 이력표 UI 전체 개선', tag: 'improve' },
+      { text: '생기부 이력표 과목 위치 변경 기능', tag: 'new' },
+      { text: '저장 및 수정 UI 구조 개선', tag: 'improve' },
+      { text: '로그인 방법 개선: 구글 계정으로만 로그인 되도록 구현', tag: 'fix' }
+    ]
+  },
+  {
+    version: 'v4 (beta)',
+    date: '2026.08.20',
+    items: [
+      { text: '메인 페이지 UI 개선', tag: 'improve' }
+    ]
+  },
+  {
+    version: 'v3 (beta)',
+    date: '2026.08.20',
+    items: [
+      { text: '메인 페이지 구현', tag: 'new' }
+    ]
+  },
+  {
+    version: 'v2 (beta)',
+    date: '2026.08.20',
+    items: [
+      { text: 'Firebase 기반 데이터 연동 기능 구현', tag: 'new' }
+    ]
+  },
+  {
+    version: 'v1 (init)',
+    date: '2026.08.20',
+    items: [
+      { text: '데이터 대입 전형 정리표와 생기부 이력표 초안 및 기본 기능 구현, 이메일 기반 로그인 기능 구현', tag: 'new' },
+      { text: '데이터 대입 전형 정리표: 기본적으로 수시 전형 대학을 대비해 구현됨. 각 대학교의 전형유형, 면접 유형과 면접 일정, 필요한 자소서 및 추천서 여부 기능, 수능 최저 필요 기능, 가능성 체크 및 정렬 기능, 캘린더에서 일정 확인 기능. 저장 기능 및 불러오기 기능', tag: 'new' },
+      { text: '생기부 이력표: 학기별 생기부 내용 정리 기능, 수상기록, 자소서 포함, 다른 활동 연계선 시각화, 과목 추가 기능. 저장 기능 및 불러오기 기능', tag: 'new' }
+    ]
+  }
 ];
 
 const logList = document.getElementById('logList');
 const tagLabel = { new:'NEW', improve:'IMPROVE', fix:'FIX' };
-CHANGELOG.forEach(item=>{
+CHANGELOG.forEach(group=>{
   const el = document.createElement('div');
   el.className = 'log-item';
   el.innerHTML = `
-    <div class="log-date">${item.date}</div>
+    <div class="log-date">${group.version}<br><span style="font-weight:400;">${group.date}</span></div>
     <div class="log-body">
-      <span class="log-tag ${item.tag}">${tagLabel[item.tag] || item.tag}</span>
-      <div class="log-title">${item.title}</div>
-      <div class="log-desc">${item.desc}</div>
+      <ul style="margin:0; padding-left:16px; display:flex; flex-direction:column; gap:6px; list-style:none; padding-left:0;">
+        ${group.items.map(i => `
+          <li>
+            <span class="log-tag ${i.tag}">${tagLabel[i.tag] || i.tag}</span>
+            <span class="log-desc" style="display:inline;">${i.text}</span>
+          </li>
+        `).join('')}
+      </ul>
     </div>`;
   logList.appendChild(el);
 });
