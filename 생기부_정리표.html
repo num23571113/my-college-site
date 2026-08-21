@@ -23,8 +23,18 @@
     --shadow-md:0 4px 14px rgba(0,0,0,0.08);
     font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   }
+  /* 다크모드: index.html과 동일한 변수 세트. 색을 바꾸려면 여기만 수정하면 됩니다. */
+  html[data-theme="dark"]{
+    --bg:#17181a; --bg-soft:#1f2023; --border:#302f32; --border-soft:#26262a;
+    --text:#f0efec; --text-soft:#b4b1ac; --text-faint:#7d7a75;
+    --accent:#e2896a; --accent-soft:#332420; --accent-deep:#f0a184;
+  }
+  html[data-theme="dark"] .board, html[data-theme="dark"] .modal, html[data-theme="dark"] .google-btn,
+  html[data-theme="dark"] .btn, html[data-theme="dark"] header, html[data-theme="dark"] .entry-card,
+  html[data-theme="dark"] .menu-dropdown, html[data-theme="dark"] td.subject-head, html[data-theme="dark"] th.sem,
+  html[data-theme="dark"] th.corner{ background:var(--bg); color:var(--text); }
   *{box-sizing:border-box;}
-  body{ margin:0; background:var(--bg-soft); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
+  body{ margin:0; background:var(--bg-soft); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; transition:background .2s, color .2s; }
 
   header{
     background:var(--bg); border-bottom:1px solid var(--border);
@@ -198,6 +208,8 @@
           <input type="file" id="importInput" class="menu-hidden-input" accept="application/json">
           <div class="menu-sep"></div>
           <button class="menu-item" id="goAdmissionsBtn">🎓 대입 전형 정리표 열기</button>
+          <button class="menu-item" id="goMainBtn">🏠 메인 사이트로</button>
+          <button class="menu-item" id="themeToggleBtn">🌓 다크모드 전환</button>
           <div class="menu-sep"></div>
           <button class="menu-item danger" id="clearBtn">🗑 전체 초기화</button>
         </div>
@@ -332,6 +344,19 @@ function showIndicator(msg, isError){
 /* ---------- menu dropdown ---------- */
 const menuBtn = document.getElementById('menuBtn'), menuDropdown = document.getElementById('menuDropdown');
 menuBtn.addEventListener('click', (e)=>{ e.stopPropagation(); menuDropdown.classList.toggle('open'); });
+
+/* 메인 사이트로 이동 + 다크모드 (index.html과 localStorage 'site_theme' 공유) */
+document.getElementById('goMainBtn').addEventListener('click', ()=>{ location.href = './index.html'; });
+document.getElementById('themeToggleBtn').addEventListener('click', ()=>{
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('site_theme', next);
+});
+(function initTheme(){
+  const saved = localStorage.getItem('site_theme');
+  if(saved) document.documentElement.setAttribute('data-theme', saved);
+})();
 document.addEventListener('click', ()=> menuDropdown.classList.remove('open'));
 menuDropdown.addEventListener('click', (e)=> e.stopPropagation());
 
