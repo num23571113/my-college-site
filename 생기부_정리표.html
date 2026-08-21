@@ -3,153 +3,223 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>생기부 이력표 — 나의 학업 기록</title>
+<title>생기부 이력표</title>
 <style>
   :root{
-    --paper:#f4efe4; --paper-line:#d9cfb8; --ink:#1e2a3a; --ink-soft:#4a5568;
-    --navy:#233350; --navy-deep:#141f33; --seal:#9b2c2c; --seal-soft:#c05656;
-    --gold:#b08d3e; --card:#fffdf7; --shadow:0 2px 8px rgba(30,42,58,0.12); --radius:6px;
-    --green:#2f7a4d; --amber:#b3801a;
-    font-family:'Noto Serif KR','Georgia',serif;
+    --bg:#ffffff;
+    --bg-soft:#fafafa;
+    --border:#e6e6e6;
+    --border-soft:#f0f0f0;
+    --text:#1a1a1a;
+    --text-soft:#6b6b6b;
+    --text-faint:#9a9a9a;
+    --accent:#d97757;
+    --accent-soft:#fbeee7;
+    --accent-deep:#b5583a;
+    --award:#c9433a;
+    --award-soft:#fdeceb;
+    --radius:10px;
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md:0 4px 14px rgba(0,0,0,0.08);
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   }
   *{box-sizing:border-box;}
-  body{ margin:0; background:linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 250px, var(--paper) 250px);
-    color:var(--ink); font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif; min-height:100vh; }
-  header{ padding:24px 32px 18px; color:#f4efe4; }
-  header .eyebrow{ font-family:'Noto Serif KR',serif; letter-spacing:.35em; font-size:11px; color:var(--gold); text-transform:uppercase; margin-bottom:6px; }
-  .headtop{ display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; }
-  header h1{ font-family:'Noto Serif KR',serif; font-size:26px; margin:0 0 4px; font-weight:700; }
-  header p{ margin:0; font-size:13px; color:#c9d2e0; }
-  .toolbar{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center; }
-  button, .btn{ font-family:inherit; font-size:12.5px; border:1px solid rgba(244,239,228,0.35);
-    background:rgba(244,239,228,0.08); color:#f4efe4; padding:8px 14px; border-radius:5px; cursor:pointer; transition:.15s; }
-  button:hover{background:rgba(244,239,228,0.2);}
-  button.primary{ background:var(--gold); border-color:var(--gold); color:#1e1608; font-weight:600; }
-  button.primary:hover{background:#c49f4c;}
-  button.danger{border-color:rgba(192,86,86,.6); color:#f3c6c6;}
-  button.danger:hover{background:rgba(192,86,86,.25);}
-  button.nav-link{ background:var(--seal); border-color:var(--seal); color:#fff; font-weight:600; }
-  button.nav-link:hover{ background:var(--seal-soft); }
+  body{ margin:0; background:var(--bg-soft); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
 
-  .authbar{ display:flex; align-items:center; gap:10px; font-size:12px; color:#dfe6f2; background:rgba(0,0,0,.18); padding:8px 12px; border-radius:20px; }
-  .authbar .dot{width:8px;height:8px;border-radius:50%; background:#888;}
-  .authbar .dot.on{background:#57c26a;}
-  .authbar input{ border:1px solid rgba(255,255,255,.3); background:rgba(255,255,255,.08); color:#fff; padding:5px 8px; border-radius:4px; font-size:12px; width:130px;}
-  .authbar input::placeholder{color:#aeb8cc;}
-  .savebar{ display:flex; align-items:center; gap:8px; font-size:11.5px; color:#c9d2e0; margin-top:8px; }
-  .savebar .pill{ background:rgba(244,239,228,0.1); padding:4px 10px; border-radius:12px; }
+  header{
+    background:var(--bg); border-bottom:1px solid var(--border);
+    padding:16px 28px; position:sticky; top:0; z-index:30;
+  }
+  .headrow{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .mark{ width:30px; height:30px; border-radius:8px; background:var(--accent); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:14px; }
+  .brand .titles h1{ font-size:16px; margin:0; font-weight:700; letter-spacing:-.01em; }
+  .brand .titles p{ font-size:12px; margin:0; color:var(--text-soft); }
 
-  .board-wrap{ padding:20px 32px 80px; }
-  .legend{ display:flex; gap:18px; font-size:12px; color:var(--ink-soft); margin-bottom:14px; align-items:center; flex-wrap:wrap; }
+  .headright{ display:flex; align-items:center; gap:10px; }
+
+  button{ font-family:inherit; cursor:pointer; }
+  .btn{ font-size:13px; border:1px solid var(--border); background:#fff; color:var(--text); padding:8px 14px; border-radius:8px; transition:.12s; }
+  .btn:hover{ background:var(--bg-soft); border-color:#d8d8d8; }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  .btn.primary:hover{ background:var(--accent-deep); border-color:var(--accent-deep); }
+  .btn.subtle{ background:transparent; border:none; color:var(--text-soft); padding:8px 10px; }
+  .btn.subtle:hover{ background:var(--bg-soft); color:var(--text); }
+  .btn.danger-text{ color:var(--award); }
+
+  .google-btn{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; border:1px solid var(--border); background:#fff; padding:8px 14px; border-radius:8px; }
+  .google-btn:hover{ background:var(--bg-soft); }
+  .google-g{ width:16px; height:16px; }
+
+  .userchip{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-soft); background:var(--bg-soft); padding:6px 12px; border-radius:20px; border:1px solid var(--border); }
+  .userchip .dot{ width:7px; height:7px; border-radius:50%; background:#bbb; }
+  .userchip .dot.on{ background:#3aa76d; }
+
+  .menu-wrap{ position:relative; }
+  .menu-btn{ width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .menu-btn:hover{ background:var(--bg-soft); }
+  .menu-dropdown{
+    position:absolute; right:0; top:44px; background:#fff; border:1px solid var(--border); border-radius:10px;
+    box-shadow:var(--shadow-md); width:230px; padding:6px; display:none; z-index:40;
+  }
+  .menu-dropdown.open{ display:block; }
+  .menu-item{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:9px 10px; border-radius:7px; border:none; background:none; font-size:13px; color:var(--text); }
+  .menu-item:hover{ background:var(--bg-soft); }
+  .menu-item.danger{ color:var(--award); }
+  .menu-sep{ height:1px; background:var(--border-soft); margin:6px 4px; }
+  .menu-hidden-input{ display:none; }
+
+  .subheadrow{ display:flex; align-items:center; justify-content:space-between; margin-top:12px; flex-wrap:wrap; gap:10px; }
+  .toolbar-left{ display:flex; gap:8px; flex-wrap:wrap; }
+  .savebar{ display:flex; gap:8px; font-size:11.5px; color:var(--text-faint); }
+  .savebar .pill{ background:var(--bg-soft); border:1px solid var(--border-soft); padding:3px 9px; border-radius:12px; }
+
+  .board-wrap{ padding:22px 28px 80px; }
+  .legend{ display:flex; gap:16px; font-size:12px; color:var(--text-soft); margin-bottom:12px; align-items:center; flex-wrap:wrap; }
   .legend span{display:flex;align-items:center;gap:6px;}
-  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
 
-  .board{ position:relative; background:var(--card); border:1px solid var(--paper-line); border-radius:8px; box-shadow:var(--shadow); overflow:auto; }
+  .board{ position:relative; background:#fff; border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow:auto; }
   table.grid{ border-collapse:collapse; width:100%; table-layout:fixed; }
-  table.grid th, table.grid td{ border:1px solid var(--paper-line); vertical-align:top; position:relative; }
-  th.corner{ width:150px; min-width:150px; background:var(--navy); color:#f4efe4; z-index:5; position:sticky; left:0; top:0; }
-  th.sem{ background:var(--navy); color:#f4efe4; padding:10px 6px; font-size:13px; letter-spacing:.03em; text-align:center; min-width:190px; position:sticky; top:0; z-index:4; }
-  th.sem .y{font-size:10px;color:var(--gold);display:block;letter-spacing:.2em;margin-bottom:2px;}
+  table.grid th, table.grid td{ border:1px solid var(--border-soft); vertical-align:top; position:relative; }
+  th.corner{ width:160px; min-width:160px; background:var(--bg-soft); z-index:5; position:sticky; left:0; top:0; }
+  th.sem{ background:var(--bg-soft); color:var(--text); padding:12px 6px; font-size:12.5px; font-weight:700; text-align:center; min-width:190px; position:sticky; top:0; z-index:4; }
+  th.sem .y{font-size:10px;color:var(--text-faint);display:block;font-weight:500;margin-bottom:2px;}
 
-  td.subject-head{ background:#ece3cd; padding:10px 10px; font-weight:700; font-size:13.5px; color:var(--navy-deep);
-    position:sticky; left:0; z-index:3; cursor:pointer; user-select:none; min-width:150px; }
-  td.subject-head:hover{background:#e3d7b7;}
-  td.subject-head .arrow{ display:inline-block; margin-right:6px; transition:transform .15s; color:var(--seal); }
+  td.subject-head{ background:#fff; padding:10px 8px 10px 6px; font-weight:700; font-size:13.5px; color:var(--text);
+    position:sticky; left:0; z-index:3; user-select:none; min-width:160px; }
+  .subj-inner{ display:flex; align-items:center; gap:4px; }
+  .subj-name{ flex:1; cursor:pointer; padding:2px 4px; border-radius:5px; }
+  .subj-name:hover{ background:var(--bg-soft); }
+  .subj-btns{ display:flex; flex-direction:column; gap:1px; }
+  .subj-btns button{ width:18px; height:15px; font-size:9px; border:none; background:var(--bg-soft); color:var(--text-faint); border-radius:3px; line-height:1; padding:0; }
+  .subj-btns button:hover{ background:var(--accent-soft); color:var(--accent-deep); }
+  .arrow{ display:inline-block; margin-right:4px; transition:transform .15s; color:var(--text-faint); font-size:10px; cursor:pointer; }
   tr.collapsed td.cell{ display:none; }
-  tr.collapsed td.subject-head .arrow{transform:rotate(-90deg);}
+  tr.collapsed .arrow{transform:rotate(-90deg);}
 
-  td.cell{ padding:8px; min-width:190px; background:#fffef9; }
-  .add-entry{ width:100%; border:1.5px dashed var(--paper-line); background:transparent; color:var(--ink-soft);
-    border-radius:5px; padding:8px 6px; font-size:11.5px; cursor:pointer; margin-top:4px; }
-  .add-entry:hover{border-color:var(--gold); color:var(--gold);}
+  td.cell{ padding:8px; min-width:190px; background:#fff; }
+  .add-entry{ width:100%; border:1px dashed var(--border); background:transparent; color:var(--text-faint);
+    border-radius:7px; padding:7px 6px; font-size:11.5px; margin-top:4px; }
+  .add-entry:hover{border-color:var(--accent); color:var(--accent-deep); background:var(--accent-soft);}
 
-  .entry-card{ background:var(--card); border:1px solid var(--paper-line); border-left:4px solid var(--navy);
-    border-radius:5px; padding:8px 9px; margin-bottom:6px; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.06); position:relative; }
-  .entry-card:hover{border-left-color:var(--gold);}
-  .entry-card.award{border-left-color:var(--seal);}
-  .entry-card .t{font-size:12.5px;font-weight:700;color:var(--navy-deep);margin-bottom:2px;}
-  .entry-card .snippet{font-size:11px;color:var(--ink-soft);line-height:1.4; display:-webkit-box; display:-webkit-box; line-clamp:2; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
-  .entry-card .tag{font-size:9.5px;color:var(--seal);font-weight:700;letter-spacing:.05em;}
-  .entry-card .meta-icons{position:absolute; top:6px; right:7px; font-size:10px; color:var(--ink-soft);}
+  .entry-card{ background:#fff; border:1px solid var(--border); border-radius:8px;
+    padding:9px 10px; margin-bottom:6px; box-shadow:var(--shadow-sm); position:relative; transition:.12s; }
+  .entry-card:hover{ border-color:var(--accent); box-shadow:var(--shadow-md); }
+  .entry-card.award{ background:var(--award-soft); border-color:#f3c9c5; }
+  .entry-card .t{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:2px;}
+  .entry-card .snippet{font-size:11px;color:var(--text-soft);line-height:1.4; display:-webkit-box; line-clamp:2; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+  .entry-card .tag{font-size:9.5px;color:var(--award);font-weight:700;letter-spacing:.02em; margin-bottom:2px;}
+  .entry-card .meta-icons{position:absolute; top:8px; right:8px; font-size:10px; color:var(--text-faint);}
 
   svg.connector-layer{ position:absolute; top:0; left:0; pointer-events:none; z-index:2; }
 
-  .modal-backdrop{ position:fixed; inset:0; background:rgba(20,31,51,0.55); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(20,20,20,0.35); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
   .modal-backdrop.open{display:flex;}
-  .modal{ background:var(--card); width:min(640px, 100%); max-height:88vh; overflow-y:auto; border-radius:8px; box-shadow:0 12px 40px rgba(0,0,0,.35); padding:22px 24px 24px; }
-  .modal h2{margin:0 0 4px; font-family:'Noto Serif KR',serif; font-size:19px; color:var(--navy-deep);}
-  .modal .sub{font-size:11.5px; color:var(--ink-soft); margin-bottom:16px;}
+  .modal{ background:#fff; width:min(640px, 100%); max-height:88vh; overflow-y:auto; border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,.18); padding:26px 28px 26px; }
+  .modal-top{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:4px; }
+  .modal h2{margin:0 0 4px; font-size:19px; font-weight:700; color:var(--text);}
+  .modal .sub{font-size:12px; color:var(--text-faint); margin-bottom:18px;}
+
+  /* view mode */
+  .view-title{ font-size:20px; font-weight:700; margin-bottom:4px; }
+  .view-badge{ display:inline-block; font-size:11px; font-weight:700; color:var(--award); background:var(--award-soft); padding:3px 9px; border-radius:12px; margin-bottom:10px; }
+  .view-section{ margin-bottom:16px; }
+  .view-section .label{ font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:.03em; margin-bottom:5px; }
+  .view-content{ font-size:14px; line-height:1.6; color:var(--text); white-space:pre-wrap; }
+  .view-empty{ color:var(--text-faint); font-size:13px; font-style:italic; }
+  .view-chip-row{ display:flex; flex-wrap:wrap; gap:6px; }
+  .view-chip{ font-size:11.5px; background:var(--bg-soft); border:1px solid var(--border); padding:4px 10px; border-radius:12px; color:var(--text-soft); }
+  .view-file, .view-link{ display:block; font-size:13px; color:var(--accent-deep); text-decoration:none; margin-bottom:4px; }
+  .view-file:hover, .view-link:hover{ text-decoration:underline; }
+
   .field{margin-bottom:14px;}
-  .field label{display:block; font-size:12px; font-weight:700; color:var(--navy); margin-bottom:5px;}
-  .field input[type=text], .field textarea, .field input[type=url], .field input[type=email], .field input[type=password], .field select{
-    width:100%; padding:8px 10px; border:1px solid var(--paper-line); border-radius:5px; font-family:inherit; font-size:13px; background:#fffef9; color:var(--ink); }
+  .field label{display:block; font-size:12.5px; font-weight:600; color:var(--text); margin-bottom:5px;}
+  .field input[type=text], .field textarea, .field input[type=url], .field select{
+    width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; background:#fff; color:var(--text); }
+  .field input:focus, .field textarea:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
   .field textarea{min-height:70px; resize:vertical;}
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   .checkline{display:flex; align-items:center; gap:8px; font-size:12.5px;}
   .file-list, .link-list{display:flex; flex-direction:column; gap:6px; margin-top:6px;}
-  .file-item, .link-item{ display:flex; align-items:center; justify-content:space-between; background:#f3ede0; border-radius:4px; padding:5px 8px; font-size:11.5px; }
-  .file-item a, .link-item a{color:var(--navy); text-decoration:none; font-weight:600;}
-  .file-item a:hover, .link-item a:hover{text-decoration:underline;}
-  .x-btn{background:none;border:none;color:var(--seal);cursor:pointer;font-size:13px;padding:0 4px;}
+  .file-item, .link-item{ display:flex; align-items:center; justify-content:space-between; background:var(--bg-soft); border-radius:6px; padding:6px 9px; font-size:11.5px; }
+  .file-item a, .link-item a{color:var(--accent-deep); text-decoration:none; font-weight:600;}
+  .x-btn{background:none;border:none;color:var(--award);cursor:pointer;font-size:13px;padding:0 4px;}
   .conn-list{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
-  .conn-chip{ font-size:11px; background:#e6ecf5; color:var(--navy); border:1px solid #c7d3e6; padding:4px 8px; border-radius:12px; cursor:pointer; }
-  .conn-chip.active{background:var(--navy); color:#fff;}
-  .modal-actions{display:flex; justify-content:space-between; margin-top:18px; gap:8px;}
+  .conn-chip{ font-size:11px; background:var(--bg-soft); color:var(--text-soft); border:1px solid var(--border); padding:5px 10px; border-radius:14px; }
+  .conn-chip.active{background:var(--text); color:#fff; border-color:var(--text);}
+  .modal-actions{display:flex; justify-content:space-between; margin-top:20px; gap:8px;}
   .modal-actions .left{display:flex; gap:8px;}
-  button.ghost{background:transparent; border:1px solid var(--paper-line); color:var(--ink-soft);}
-  button.ghost:hover{background:#f3ede0;}
-  small.hint{color:var(--ink-soft); font-size:11px;}
+  small.hint{color:var(--text-faint); font-size:11px;}
   input[type=file]{font-size:11.5px;}
 
-  .empty-note{padding:40px; text-align:center; color:var(--ink-soft); font-size:13px;}
-  footer{text-align:center; font-size:11px; color:var(--ink-soft); padding:20px;}
-  .save-indicator{ position:fixed; bottom:16px; right:16px; background:var(--navy); color:#f4efe4; font-size:11.5px;
-    padding:8px 14px; border-radius:20px; opacity:0; transition:opacity .3s; box-shadow:var(--shadow); z-index:60; }
+  .empty-note{padding:50px 20px; text-align:center; color:var(--text-faint); font-size:13px;}
+  footer{text-align:center; font-size:11.5px; color:var(--text-faint); padding:24px;}
+  .save-indicator{ position:fixed; bottom:20px; right:20px; background:var(--text); color:#fff; font-size:12px;
+    padding:9px 16px; border-radius:20px; opacity:0; transition:opacity .3s; box-shadow:var(--shadow-md); z-index:60; }
   .save-indicator.show{opacity:1;}
-  .save-indicator.error{background:var(--seal);}
+  .save-indicator.error{background:var(--award);}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="headtop">
-    <div>
-      <div class="eyebrow">STUDENT RECORD LEDGER</div>
-      <h1>나의 생기부 이력표</h1>
-      <p>1학년 1학기부터 3학년 2학기까지, 과목별 활동을 한눈에 — 클라우드 자동 저장 지원</p>
+  <div class="headrow">
+    <div class="brand">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+          <line x1="7" y1="9" x2="17" y2="9"></line>
+          <line x1="7" y1="13" x2="17" y2="13"></line>
+          <line x1="7" y1="17" x2="12" y2="17"></line>
+        </svg>
+      </div>
+      <div class="titles">
+        <h1>생기부 이력표</h1>
+        <p>학기 × 과목별 활동을 한눈에</p>
+      </div>
     </div>
-    <div class="authbar" id="authbar">
-      <span class="dot" id="authDot"></span>
-      <span id="authStatus">연결 확인 중...</span>
-      <input type="email" id="authEmail" placeholder="이메일">
-      <input type="password" id="authPw" placeholder="비밀번호">
-      <button id="loginBtn">로그인</button>
-      <button id="signupBtn">회원가입</button>
-      <button id="logoutBtn" style="display:none;">로그아웃</button>
+    <div class="headright">
+      <div id="signedOutBlock">
+        <button class="google-btn" id="googleLoginBtn">
+          <svg class="google-g" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.6C29.6 35.1 26.9 36 24 36c-5.3 0-9.7-3.4-11.3-8.1l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.5l6.6 5.6C39.9 37 44 31 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+          Google로 계속하기
+        </button>
+      </div>
+      <div id="signedInBlock" style="display:none;">
+        <div class="userchip"><span class="dot on"></span><span id="userEmail"></span><button class="btn subtle" id="logoutBtn" style="padding:2px 6px;">로그아웃</button></div>
+      </div>
+      <div class="menu-wrap">
+        <button class="menu-btn" id="menuBtn">☰</button>
+        <div class="menu-dropdown" id="menuDropdown">
+          <button class="menu-item" id="loadSampleBtn">🧪 예시 데이터로 미리보기</button>
+          <button class="menu-item" id="exportBtn">⬇️ 백업 파일 다운로드</button>
+          <button class="menu-item" id="importTrigger">⬆️ 백업 파일 불러오기</button>
+          <input type="file" id="importInput" class="menu-hidden-input" accept="application/json">
+          <div class="menu-sep"></div>
+          <button class="menu-item" id="goAdmissionsBtn">🎓 대입 전형 정리표 열기</button>
+          <div class="menu-sep"></div>
+          <button class="menu-item danger" id="clearBtn">🗑 전체 초기화</button>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="toolbar">
-    <button class="primary" id="addSubjectBtn">➕ 과목 추가</button>
-    <button id="loadSampleBtn">🧪 예시 데이터로 미리보기</button>
-    <button id="exportBtn">💾 백업 파일 다운로드 (JSON)</button>
-    <label class="btn" style="display:inline-flex;align-items:center;">
-      📂 백업 파일 불러오기
-      <input type="file" id="importInput" accept="application/json" style="display:none;">
-    </label>
-    <button class="danger" id="clearBtn">🗑 전체 초기화</button>
-    <button class="nav-link" id="goAdmissionsBtn">🎓 대입 전형 정리표 열기 →</button>
-  </div>
-  <div class="savebar">
-    <span class="pill" id="saveTimestamp">아직 저장 기록 없음</span>
-    <span class="pill" id="cloudStatus">☁️ 클라우드: 미설정</span>
+  <div class="subheadrow">
+    <div class="toolbar-left">
+      <button class="btn primary" id="addSubjectBtn">＋ 과목 추가</button>
+    </div>
+    <div class="savebar">
+      <span class="pill" id="saveTimestamp">저장 기록 없음</span>
+      <span class="pill" id="cloudStatus">클라우드 미설정</span>
+    </div>
   </div>
 </header>
 
 <div class="board-wrap">
   <div class="legend">
-    <span><span class="dot" style="background:var(--navy);"></span>일반 활동</span>
-    <span><span class="dot" style="background:var(--seal);"></span>수상 기록</span>
-    <span>· 선으로 이어진 카드는 서로 연계된 활동입니다 (카드 클릭 → 연계 설정)</span>
+    <span><span class="dot" style="background:#cfcfcf;"></span>일반 활동</span>
+    <span><span class="dot" style="background:var(--award);"></span>수상 기록</span>
+    <span>· 점선으로 이어진 카드는 서로 연계된 활동입니다</span>
   </div>
   <div class="board" id="boardScroll">
     <svg class="connector-layer" id="connLayer"></svg>
@@ -160,43 +230,15 @@
   </div>
 </div>
 
-<footer>로그인하면 데이터가 Firebase 클라우드에 저장되어 어떤 기기에서든 같은 계정으로 접속하면 이어서 볼 수 있습니다. 로그인하지 않으면 이 브라우저에만 임시 저장됩니다. 정기적으로 "백업 파일 다운로드"를 눌러 보관하는 것을 권장합니다.</footer>
+<footer>Google 계정으로 로그인하면 데이터가 클라우드에 저장되어 어떤 기기에서든 이어서 볼 수 있습니다. 로그인하지 않으면 이 브라우저에만 임시 저장됩니다.</footer>
 
+<!-- Entry Modal -->
 <div class="modal-backdrop" id="modalBackdrop">
-  <div class="modal">
-    <h2 id="modalTitle">활동 입력</h2>
-    <div class="sub" id="modalSub"></div>
-    <div class="field"><label>제목</label><input type="text" id="f_title" placeholder="예: 교내 과학탐구발표대회 참가"></div>
-    <div class="field"><label>내용</label><textarea id="f_content" placeholder="생기부 원문 또는 요약 내용을 입력하세요"></textarea></div>
-    <div class="row2">
-      <div class="field checkline" style="margin-bottom:0;"><input type="checkbox" id="f_award"><label for="f_award" style="margin:0;">수상 기록입니다</label></div>
-      <div class="field" style="margin-bottom:0;"><input type="text" id="f_awardname" placeholder="수상명 (해당 시)"></div>
-    </div>
-    <div class="field">
-      <label>사진 / 보고서 파일 첨부</label>
-      <input type="file" id="f_file" multiple>
-      <div class="file-list" id="fileList"></div>
-      <small class="hint">파일은 클라우드에 함께 저장됩니다. 큰 PDF가 많으면 저장 용량이 커질 수 있어요.</small>
-    </div>
-    <div class="field">
-      <label>참고 자료 링크</label>
-      <div style="display:flex; gap:6px;"><input type="url" id="f_linkurl" placeholder="https://..."><button id="addLinkBtn" class="ghost" style="white-space:nowrap;">추가</button></div>
-      <div class="link-list" id="linkList"></div>
-    </div>
-    <div class="field"><label>메모 (추가로 공부할 내용 / 자소서 활용 여부 / 다음 학기 연결점)</label>
-      <textarea id="f_memo" placeholder="예: 3학년 세특과 연결 가능 / 자소서 2번 문항에 활용 예정"></textarea></div>
-    <div class="field"><label>다른 활동과 연계 표시</label><div class="conn-list" id="connList"></div>
-      <small class="hint">칩을 클릭하면 연계(선 연결)가 켜지거나 꺼집니다.</small></div>
-    <div class="modal-actions">
-      <div class="left"><button class="danger" id="deleteEntryBtn">삭제</button></div>
-      <div class="left"><button class="ghost" id="cancelBtn">취소</button><button class="primary" id="saveEntryBtn">저장</button></div>
-    </div>
-  </div>
+  <div class="modal" id="modalBody"></div>
 </div>
 
 <div class="save-indicator" id="saveIndicator">저장됨</div>
 
-<!-- Firebase SDK (compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -209,73 +251,46 @@ const SEMESTERS = [
 ];
 const STORAGE_KEY = 'saenggibu_ledger_v1';
 let state = loadLocal() || { subjects: [], entries: {}, lastSaved:null };
-let editingEntryId = null, editingContext = null;
+let editingEntryId = null, editingContext = null, modalMode = 'view'; // 'view' | 'edit'
 let tempFiles = [], tempLinks = [], tempConnections = [];
 
 function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
 function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-/* ---------- Firebase 초기화 ---------- */
-let fbApp=null, fbAuth=null, fbDb=null, currentUser=null, cloudReady=false;
+/* ---------- Firebase ---------- */
+let fbAuth=null, fbDb=null, currentUser=null, cloudReady=false;
 try{
   if(firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('여기에')){
-    fbApp = firebase.initializeApp(firebaseConfig);
-    fbAuth = firebase.auth();
-    fbDb = firebase.firestore();
-    cloudReady = true;
-    document.getElementById('cloudStatus').textContent = '☁️ 클라우드: 연결됨';
+    firebase.initializeApp(firebaseConfig);
+    fbAuth = firebase.auth(); fbDb = firebase.firestore(); cloudReady = true;
+    document.getElementById('cloudStatus').textContent = '클라우드 연결됨';
   }else{
-    document.getElementById('cloudStatus').textContent = '☁️ 클라우드: 설정 안 됨 (firebase-config.js 확인)';
-    document.getElementById('authStatus').textContent = '클라우드 미설정 (로컬 저장만 사용)';
+    document.getElementById('cloudStatus').textContent = '클라우드 설정 안 됨';
   }
-}catch(e){
-  document.getElementById('cloudStatus').textContent = '☁️ 클라우드: 연결 실패';
-  console.error(e);
-}
+}catch(e){ document.getElementById('cloudStatus').textContent='클라우드 연결 실패'; console.error(e); }
 
 if(cloudReady){
   fbAuth.onAuthStateChanged(async (user)=>{
     currentUser = user;
-    const dot = document.getElementById('authDot');
     if(user){
-      dot.classList.add('on');
-      document.getElementById('authStatus').textContent = user.email;
-      document.getElementById('loginBtn').style.display='none';
-      document.getElementById('signupBtn').style.display='none';
-      document.getElementById('logoutBtn').style.display='inline-block';
-      document.getElementById('authEmail').style.display='none';
-      document.getElementById('authPw').style.display='none';
+      document.getElementById('signedOutBlock').style.display='none';
+      document.getElementById('signedInBlock').style.display='block';
+      document.getElementById('userEmail').textContent = user.email || user.displayName || '로그인됨';
       await loadFromCloud();
     }else{
-      dot.classList.remove('on');
-      document.getElementById('authStatus').textContent = '로그인 안 함 (로컬에만 저장됨)';
-      document.getElementById('loginBtn').style.display='inline-block';
-      document.getElementById('signupBtn').style.display='inline-block';
-      document.getElementById('logoutBtn').style.display='none';
-      document.getElementById('authEmail').style.display='inline-block';
-      document.getElementById('authPw').style.display='inline-block';
+      document.getElementById('signedOutBlock').style.display='block';
+      document.getElementById('signedInBlock').style.display='none';
       render();
     }
   });
-
-  document.getElementById('loginBtn').addEventListener('click', async ()=>{
-    const email = document.getElementById('authEmail').value.trim();
-    const pw = document.getElementById('authPw').value;
-    if(!email||!pw) return alert('이메일/비밀번호를 입력하세요.');
-    try{ await fbAuth.signInWithEmailAndPassword(email, pw); }
+  document.getElementById('googleLoginBtn').addEventListener('click', async ()=>{
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try{ await fbAuth.signInWithPopup(provider); }
     catch(e){ alert('로그인 실패: '+e.message); }
-  });
-  document.getElementById('signupBtn').addEventListener('click', async ()=>{
-    const email = document.getElementById('authEmail').value.trim();
-    const pw = document.getElementById('authPw').value;
-    if(!email||!pw) return alert('이메일/비밀번호를 입력하세요.');
-    if(pw.length<6) return alert('비밀번호는 6자 이상이어야 합니다.');
-    try{ await fbAuth.createUserWithEmailAndPassword(email, pw); alert('회원가입 완료! 자동으로 로그인됩니다.'); }
-    catch(e){ alert('회원가입 실패: '+e.message); }
   });
   document.getElementById('logoutBtn').addEventListener('click', ()=> fbAuth.signOut());
 }else{
-  document.getElementById('authbar').style.display='none';
+  document.getElementById('signedOutBlock').style.display='none';
 }
 
 async function loadFromCloud(){
@@ -286,55 +301,39 @@ async function loadFromCloud(){
       const data = doc.data();
       state = { subjects: data.subjects||[], entries: data.entries||{}, lastSaved: data.lastSaved||null };
       saveLocal();
-    }else{
-      await saveToCloud();
-    }
-  }catch(e){
-    console.error(e);
-    showIndicator('클라우드 불러오기 실패', true);
-  }
+    }else{ await saveToCloud(); }
+  }catch(e){ console.error(e); showIndicator('클라우드 불러오기 실패', true); }
   render();
 }
-
 async function saveToCloud(){
   if(!cloudReady || !currentUser) return;
   try{
     await fbDb.collection('users').doc(currentUser.uid).collection('ledger').doc('main')
       .set({ subjects: state.subjects, entries: state.entries, lastSaved: new Date().toISOString() });
-  }catch(e){
-    console.error(e);
-    showIndicator('클라우드 저장 실패 (로컬에는 저장됨)', true);
-  }
+  }catch(e){ console.error(e); showIndicator('클라우드 저장 실패 (로컬에는 저장됨)', true); }
 }
-
 function saveLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function loadLocal(){ try{ const raw = localStorage.getItem(STORAGE_KEY); return raw?JSON.parse(raw):null; }catch(e){ return null; } }
-
+function loadLocal(){ try{ const raw=localStorage.getItem(STORAGE_KEY); return raw?JSON.parse(raw):null; }catch(e){ return null; } }
 async function persist(){
   state.lastSaved = new Date().toISOString();
-  saveLocal();
-  updateTimestamp();
-  showIndicator('저장됨');
+  saveLocal(); updateTimestamp(); showIndicator('저장됨');
   await saveToCloud();
 }
-
 function updateTimestamp(){
   const el = document.getElementById('saveTimestamp');
-  if(state.lastSaved){
-    const d = new Date(state.lastSaved);
-    el.textContent = '🕒 마지막 저장: ' + d.toLocaleString('ko-KR');
-  }else{
-    el.textContent = '아직 저장 기록 없음';
-  }
+  el.textContent = state.lastSaved ? '마지막 저장 ' + new Date(state.lastSaved).toLocaleString('ko-KR') : '저장 기록 없음';
 }
-
 function showIndicator(msg, isError){
   const ind = document.getElementById('saveIndicator');
-  ind.textContent = msg; ind.classList.toggle('error', !!isError);
-  ind.classList.add('show');
-  clearTimeout(showIndicator._t);
-  showIndicator._t = setTimeout(()=>ind.classList.remove('show'), 1600);
+  ind.textContent = msg; ind.classList.toggle('error', !!isError); ind.classList.add('show');
+  clearTimeout(showIndicator._t); showIndicator._t = setTimeout(()=>ind.classList.remove('show'), 1500);
 }
+
+/* ---------- menu dropdown ---------- */
+const menuBtn = document.getElementById('menuBtn'), menuDropdown = document.getElementById('menuDropdown');
+menuBtn.addEventListener('click', (e)=>{ e.stopPropagation(); menuDropdown.classList.toggle('open'); });
+document.addEventListener('click', ()=> menuDropdown.classList.remove('open'));
+menuDropdown.addEventListener('click', (e)=> e.stopPropagation());
 
 /* ---------- rendering ---------- */
 function render(){ renderHead(); renderBody(); updateTimestamp(); requestAnimationFrame(drawConnections); }
@@ -354,22 +353,41 @@ function renderBody(){
   if(state.subjects.length === 0){
     const tr = document.createElement('tr'); const td = document.createElement('td');
     td.colSpan = SEMESTERS.length + 1; td.className='empty-note';
-    td.textContent = '아직 과목이 없습니다. "과목 추가" 버튼을 누르거나, "예시 데이터로 미리보기"를 눌러 테스트해보세요.';
+    td.textContent = '아직 과목이 없습니다. "과목 추가"를 누르거나, 메뉴에서 예시 데이터를 불러와보세요.';
     tr.appendChild(td); body.appendChild(tr); return;
   }
-  state.subjects.forEach(subject=>{
+  state.subjects.forEach((subject, idx)=>{
     const tr = document.createElement('tr'); tr.dataset.subjectId = subject.id;
     if(subject.collapsed) tr.classList.add('collapsed');
     const th = document.createElement('td'); th.className='subject-head';
-    th.innerHTML = `<span class="arrow">▾</span>${escapeHtml(subject.name)}`;
-    th.title = '클릭하면 접거나 펼칩니다';
-    th.addEventListener('click', ()=>{ subject.collapsed = !subject.collapsed; persist(); render(); });
-    th.addEventListener('dblclick', (e)=>{
+
+    const inner = document.createElement('div'); inner.className='subj-inner';
+
+    const arrow = document.createElement('span'); arrow.className='arrow'; arrow.textContent='▾';
+    arrow.addEventListener('click', ()=>{ subject.collapsed = !subject.collapsed; persist(); render(); });
+
+    const nameSpan = document.createElement('span'); nameSpan.className='subj-name';
+    nameSpan.textContent = subject.name;
+    nameSpan.addEventListener('click', ()=>{ subject.collapsed = !subject.collapsed; persist(); render(); });
+    nameSpan.addEventListener('dblclick', (e)=>{
       e.stopPropagation();
       const newName = prompt('과목 이름 수정', subject.name);
       if(newName && newName.trim()){ subject.name = newName.trim(); persist(); render(); }
     });
+
+    const btns = document.createElement('div'); btns.className='subj-btns';
+    const upBtn = document.createElement('button'); upBtn.textContent='▲'; upBtn.title='위로 이동';
+    upBtn.disabled = idx===0;
+    upBtn.addEventListener('click', (e)=>{ e.stopPropagation(); if(idx>0){ [state.subjects[idx-1], state.subjects[idx]] = [state.subjects[idx], state.subjects[idx-1]]; persist(); render(); } });
+    const downBtn = document.createElement('button'); downBtn.textContent='▼'; downBtn.title='아래로 이동';
+    downBtn.disabled = idx===state.subjects.length-1;
+    downBtn.addEventListener('click', (e)=>{ e.stopPropagation(); if(idx<state.subjects.length-1){ [state.subjects[idx+1], state.subjects[idx]] = [state.subjects[idx], state.subjects[idx+1]]; persist(); render(); } });
+    btns.appendChild(upBtn); btns.appendChild(downBtn);
+
+    inner.appendChild(arrow); inner.appendChild(nameSpan); inner.appendChild(btns);
+    th.appendChild(inner);
     tr.appendChild(th);
+
     SEMESTERS.forEach(sem=>{
       const td = document.createElement('td'); td.className='cell';
       td.dataset.subjectId = subject.id; td.dataset.semId = sem.id;
@@ -385,11 +403,11 @@ function renderBody(){
           ${entry.award ? `<div class="tag">🏅 수상</div>` : ''}
           <div class="t">${escapeHtml(entry.title || '(제목 없음)')}</div>
           <div class="snippet">${escapeHtml(entry.content || '')}</div>`;
-        card.addEventListener('click', ()=> openModal(entry.id));
+        card.addEventListener('click', ()=> openModal(entry.id, null, 'view'));
         td.appendChild(card);
       });
       const addBtn = document.createElement('button'); addBtn.className='add-entry'; addBtn.textContent='+ 활동 추가';
-      addBtn.addEventListener('click', ()=> openModal(null, {subjectId:subject.id, semId:sem.id}));
+      addBtn.addEventListener('click', ()=> openModal(null, {subjectId:subject.id, semId:sem.id}, 'edit'));
       td.appendChild(addBtn);
       tr.appendChild(td);
     });
@@ -420,8 +438,8 @@ function drawConnections(){
       const path = document.createElementNS('http://www.w3.org/2000/svg','path');
       const midY = (y1+y2)/2;
       path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`);
-      path.setAttribute('stroke', '#b08d3e'); path.setAttribute('stroke-width', '1.6');
-      path.setAttribute('fill', 'none'); path.setAttribute('opacity', '0.75'); path.setAttribute('stroke-dasharray', '4 3');
+      path.setAttribute('stroke', '#d97757'); path.setAttribute('stroke-width', '1.4');
+      path.setAttribute('fill', 'none'); path.setAttribute('opacity', '0.55'); path.setAttribute('stroke-dasharray', '3 3');
       svg.appendChild(path);
     });
   });
@@ -433,36 +451,160 @@ document.getElementById('addSubjectBtn').addEventListener('click', ()=>{
   const name = prompt('과목 이름을 입력하세요 (예: 통합사회, 화법과 작문)');
   if(name && name.trim()){ state.subjects.push({id: uid('subj'), name: name.trim(), collapsed:false}); persist(); render(); }
 });
-
-document.getElementById('goAdmissionsBtn').addEventListener('click', ()=>{
-  window.open('./대입_전형_정리표.html', '_blank');
-});
+document.getElementById('goAdmissionsBtn').addEventListener('click', ()=> window.open('./대입_전형_정리표.html', '_blank'));
 
 /* ---------- modal ---------- */
-function openModal(entryId, context){
-  editingEntryId = entryId; editingContext = context;
+function openModal(entryId, context, mode){
+  editingEntryId = entryId; editingContext = context; modalMode = mode;
   document.getElementById('modalBackdrop').classList.add('open');
-  let entry;
-  if(entryId){ entry = state.entries[entryId]; document.getElementById('modalTitle').textContent='활동 편집'; document.getElementById('deleteEntryBtn').style.display='inline-block'; }
-  else{ entry = {title:'',content:'',award:false,awardName:'',files:[],links:[],memo:'',connections:[]}; document.getElementById('modalTitle').textContent='새 활동 입력'; document.getElementById('deleteEntryBtn').style.display='none'; }
-  const subjId = entryId ? entry.subjectId : context.subjectId;
-  const semId = entryId ? entry.semId : context.semId;
-  const subj = state.subjects.find(s=>s.id===subjId), sem = SEMESTERS.find(s=>s.id===semId);
-  document.getElementById('modalSub').textContent = `${subj?subj.name:''} · ${sem?sem.label+' '+sem.sub:''}`;
-  document.getElementById('f_title').value = entry.title||'';
-  document.getElementById('f_content').value = entry.content||'';
-  document.getElementById('f_award').checked = !!entry.award;
-  document.getElementById('f_awardname').value = entry.awardName||'';
-  document.getElementById('f_memo').value = entry.memo||'';
-  tempFiles = (entry.files||[]).slice(); tempLinks = (entry.links||[]).slice(); tempConnections = (entry.connections||[]).slice();
-  renderFileList(); renderLinkList(); renderConnList();
+  if(mode === 'view') renderViewMode(); else renderEditMode();
 }
 function closeModal(){ document.getElementById('modalBackdrop').classList.remove('open'); editingEntryId=null; editingContext=null; }
-document.getElementById('cancelBtn').addEventListener('click', closeModal);
-document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='modalBackdrop') closeModal(); });
+
+function renderViewMode(){
+  const entry = state.entries[editingEntryId];
+  const subj = state.subjects.find(s=>s.id===entry.subjectId), sem = SEMESTERS.find(s=>s.id===entry.semId);
+  const modal = document.getElementById('modalBody');
+  modal.innerHTML = `
+    <div class="sub">${subj?subj.name:''} · ${sem?sem.label+' '+sem.sub:''}</div>
+    ${entry.award ? `<div class="view-badge">🏅 수상 ${entry.awardName?('· '+escapeHtml(entry.awardName)):''}</div>` : ''}
+    <div class="view-title">${escapeHtml(entry.title||'(제목 없음)')}</div>
+
+    <div class="view-section">
+      <div class="label">내용</div>
+      <div class="view-content">${entry.content ? escapeHtml(entry.content) : '<span class="view-empty">작성된 내용이 없습니다.</span>'}</div>
+    </div>
+
+    <div class="view-section">
+      <div class="label">첨부 파일</div>
+      ${ (entry.files&&entry.files.length) ? entry.files.map(f=>`<a class="view-file" href="${f.dataUrl}" target="_blank" rel="noopener">📎 ${escapeHtml(f.name)}</a>`).join('') : '<span class="view-empty">없음</span>' }
+    </div>
+
+    <div class="view-section">
+      <div class="label">참고 링크</div>
+      ${ (entry.links&&entry.links.length) ? entry.links.map(l=>`<a class="view-link" href="${l.url}" target="_blank" rel="noopener">🔗 ${escapeHtml(l.url)}</a>`).join('') : '<span class="view-empty">없음</span>' }
+    </div>
+
+    <div class="view-section">
+      <div class="label">메모</div>
+      <div class="view-content">${entry.memo ? escapeHtml(entry.memo) : '<span class="view-empty">작성된 메모가 없습니다.</span>'}</div>
+    </div>
+
+    <div class="view-section">
+      <div class="label">연계된 활동</div>
+      <div class="view-chip-row">
+        ${ (entry.connections&&entry.connections.length) ? entry.connections.map(id=>{
+            const o = state.entries[id]; if(!o) return '';
+            return `<span class="view-chip">${escapeHtml(o.title||'(제목없음)')}</span>`;
+          }).join('') : '<span class="view-empty">없음</span>' }
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <div class="left"><button class="btn danger-text" id="vDeleteBtn">삭제</button></div>
+      <div class="left"><button class="btn" id="vCloseBtn">닫기</button><button class="btn primary" id="vEditBtn">✏️ 수정</button></div>
+    </div>
+  `;
+  document.getElementById('vCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('vEditBtn').addEventListener('click', ()=>{ modalMode='edit'; renderEditMode(); });
+  document.getElementById('vDeleteBtn').addEventListener('click', ()=>{
+    if(!confirm('이 활동을 삭제할까요?')) return;
+    const id = editingEntryId;
+    Object.values(state.entries).forEach(e=>{ e.connections = (e.connections||[]).filter(x=>x!==id); });
+    delete state.entries[id]; persist(); closeModal(); render();
+  });
+}
+
+function renderEditMode(){
+  let entry;
+  const isNew = !editingEntryId;
+  if(!isNew){ entry = state.entries[editingEntryId]; }
+  else{ entry = {title:'',content:'',award:false,awardName:'',files:[],links:[],memo:'',connections:[]}; }
+
+  const subjId = isNew ? editingContext.subjectId : entry.subjectId;
+  const semId = isNew ? editingContext.semId : entry.semId;
+  const subj = state.subjects.find(s=>s.id===subjId), sem = SEMESTERS.find(s=>s.id===semId);
+
+  tempFiles = (entry.files||[]).slice(); tempLinks = (entry.links||[]).slice(); tempConnections = (entry.connections||[]).slice();
+
+  const modal = document.getElementById('modalBody');
+  modal.innerHTML = `
+    <h2>${isNew ? '새 활동 입력' : '활동 편집'}</h2>
+    <div class="sub">${subj?subj.name:''} · ${sem?sem.label+' '+sem.sub:''}</div>
+
+    <div class="field"><label>제목</label><input type="text" id="f_title" placeholder="예: 교내 과학탐구발표대회 참가" value="${escapeHtml(entry.title||'')}"></div>
+    <div class="field"><label>내용</label><textarea id="f_content" placeholder="생기부 원문 또는 요약 내용을 입력하세요">${escapeHtml(entry.content||'')}</textarea></div>
+    <div class="row2">
+      <div class="field checkline" style="margin-bottom:0;"><input type="checkbox" id="f_award" ${entry.award?'checked':''}><label for="f_award" style="margin:0;">수상 기록입니다</label></div>
+      <div class="field" style="margin-bottom:0;"><input type="text" id="f_awardname" placeholder="수상명 (해당 시)" value="${escapeHtml(entry.awardName||'')}"></div>
+    </div>
+    <div class="field">
+      <label>사진 / 보고서 파일 첨부</label>
+      <input type="file" id="f_file" multiple>
+      <div class="file-list" id="fileList"></div>
+      <small class="hint">파일은 클라우드에 함께 저장됩니다. 큰 파일이 많으면 용량이 커질 수 있어요.</small>
+    </div>
+    <div class="field">
+      <label>참고 자료 링크</label>
+      <div style="display:flex; gap:6px;"><input type="url" id="f_linkurl" placeholder="https://..."><button class="btn" id="addLinkBtn" type="button" style="white-space:nowrap;">추가</button></div>
+      <div class="link-list" id="linkList"></div>
+    </div>
+    <div class="field"><label>메모 (추가로 공부할 내용 / 자소서 활용 여부 / 다음 학기 연결점)</label>
+      <textarea id="f_memo" placeholder="예: 3학년 세특과 연결 가능 / 자소서 2번 문항에 활용 예정">${escapeHtml(entry.memo||'')}</textarea></div>
+    <div class="field"><label>다른 활동과 연계 표시</label><div class="conn-list" id="connList"></div>
+      <small class="hint">칩을 클릭하면 연계(선 연결)가 켜지거나 꺼집니다.</small></div>
+
+    <div class="modal-actions">
+      <div class="left">${!isNew ? '<button class="btn danger-text" id="eDeleteBtn">삭제</button>' : ''}</div>
+      <div class="left"><button class="btn" id="eCancelBtn">취소</button><button class="btn primary" id="eSaveBtn">저장</button></div>
+    </div>
+  `;
+
+  renderFileList(); renderLinkList(); renderConnList();
+
+  document.getElementById('f_file').addEventListener('change', (e)=>{
+    Array.from(e.target.files).forEach(file=>{
+      const reader = new FileReader();
+      reader.onload = ()=>{ tempFiles.push({name:file.name, dataUrl:reader.result}); renderFileList(); };
+      reader.readAsDataURL(file);
+    });
+    e.target.value='';
+  });
+  document.getElementById('addLinkBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('f_linkurl'); const url = input.value.trim();
+    if(url){ tempLinks.push({url}); input.value=''; renderLinkList(); }
+  });
+  document.getElementById('eCancelBtn').addEventListener('click', ()=>{
+    if(isNew) closeModal(); else { modalMode='view'; renderViewMode(); }
+  });
+  if(!isNew) document.getElementById('eDeleteBtn').addEventListener('click', ()=>{
+    if(!confirm('이 활동을 삭제할까요?')) return;
+    const id = editingEntryId;
+    Object.values(state.entries).forEach(e=>{ e.connections = (e.connections||[]).filter(x=>x!==id); });
+    delete state.entries[id]; persist(); closeModal(); render();
+  });
+  document.getElementById('eSaveBtn').addEventListener('click', ()=>{
+    const title = document.getElementById('f_title').value.trim();
+    if(!title){ alert('제목을 입력해주세요.'); return; }
+    const content = document.getElementById('f_content').value.trim();
+    const award = document.getElementById('f_award').checked;
+    const awardName = document.getElementById('f_awardname').value.trim();
+    const memo = document.getElementById('f_memo').value.trim();
+    let id = editingEntryId, sId, seId;
+    if(id){ sId = state.entries[id].subjectId; seId = state.entries[id].semId; }
+    else{ id = uid('entry'); sId = editingContext.subjectId; seId = editingContext.semId; }
+    state.entries[id] = { id, subjectId:sId, semId:seId, title, content, award, awardName, memo, files:tempFiles, links:tempLinks, connections:tempConnections };
+    tempConnections.forEach(otherId=>{ const other=state.entries[otherId]; if(other && !other.connections.includes(id)) other.connections.push(id); });
+    Object.values(state.entries).forEach(e=>{ if(e.id===id) return; if(e.connections.includes(id) && !tempConnections.includes(e.id)) e.connections = e.connections.filter(x=>x!==id); });
+    persist();
+    editingEntryId = id; modalMode='view';
+    renderViewMode();
+    render();
+  });
+}
 
 function renderFileList(){
-  const list = document.getElementById('fileList'); list.innerHTML='';
+  const list = document.getElementById('fileList'); if(!list) return; list.innerHTML='';
   tempFiles.forEach((f, idx)=>{
     const div = document.createElement('div'); div.className='file-item';
     div.innerHTML = `<a href="${f.dataUrl}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a>`;
@@ -471,16 +613,8 @@ function renderFileList(){
     div.appendChild(x); list.appendChild(div);
   });
 }
-document.getElementById('f_file').addEventListener('change', (e)=>{
-  Array.from(e.target.files).forEach(file=>{
-    const reader = new FileReader();
-    reader.onload = ()=>{ tempFiles.push({name:file.name, dataUrl:reader.result}); renderFileList(); };
-    reader.readAsDataURL(file);
-  });
-  e.target.value='';
-});
 function renderLinkList(){
-  const list = document.getElementById('linkList'); list.innerHTML='';
+  const list = document.getElementById('linkList'); if(!list) return; list.innerHTML='';
   tempLinks.forEach((l, idx)=>{
     const div = document.createElement('div'); div.className='link-item';
     div.innerHTML = `<a href="${l.url}" target="_blank" rel="noopener">${escapeHtml(l.url)}</a>`;
@@ -489,12 +623,8 @@ function renderLinkList(){
     div.appendChild(x); list.appendChild(div);
   });
 }
-document.getElementById('addLinkBtn').addEventListener('click', ()=>{
-  const input = document.getElementById('f_linkurl'); const url = input.value.trim();
-  if(url){ tempLinks.push({url}); input.value=''; renderLinkList(); }
-});
 function renderConnList(){
-  const list = document.getElementById('connList'); list.innerHTML='';
+  const list = document.getElementById('connList'); if(!list) return; list.innerHTML='';
   const others = Object.values(state.entries).filter(e=> e.id !== editingEntryId);
   if(others.length===0){ list.innerHTML = '<small class="hint">연결할 다른 활동이 아직 없습니다.</small>'; return; }
   others.forEach(o=>{
@@ -505,33 +635,17 @@ function renderConnList(){
     list.appendChild(chip);
   });
 }
-document.getElementById('saveEntryBtn').addEventListener('click', ()=>{
-  const title = document.getElementById('f_title').value.trim();
-  if(!title){ alert('제목을 입력해주세요.'); return; }
-  const content = document.getElementById('f_content').value.trim();
-  const award = document.getElementById('f_award').checked;
-  const awardName = document.getElementById('f_awardname').value.trim();
-  const memo = document.getElementById('f_memo').value.trim();
-  let id = editingEntryId, subjectId, semId;
-  if(id){ subjectId = state.entries[id].subjectId; semId = state.entries[id].semId; }
-  else{ id = uid('entry'); subjectId = editingContext.subjectId; semId = editingContext.semId; }
-  state.entries[id] = { id, subjectId, semId, title, content, award, awardName, memo, files:tempFiles, links:tempLinks, connections:tempConnections };
-  tempConnections.forEach(otherId=>{ const other=state.entries[otherId]; if(other && !other.connections.includes(id)) other.connections.push(id); });
-  Object.values(state.entries).forEach(e=>{ if(e.id===id) return; if(e.connections.includes(id) && !tempConnections.includes(e.id)) e.connections = e.connections.filter(x=>x!==id); });
-  persist(); closeModal(); render();
-});
-document.getElementById('deleteEntryBtn').addEventListener('click', ()=>{
-  if(!editingEntryId) return; if(!confirm('이 활동을 삭제할까요?')) return;
-  const id = editingEntryId;
-  Object.values(state.entries).forEach(e=>{ e.connections = (e.connections||[]).filter(x=>x!==id); });
-  delete state.entries[id]; persist(); closeModal(); render();
-});
 
+document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='modalBackdrop') closeModal(); });
+
+/* ---------- import/export/menu actions ---------- */
 document.getElementById('exportBtn').addEventListener('click', ()=>{
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
   a.href = url; a.download = `생기부_이력표_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
+  menuDropdown.classList.remove('open');
 });
+document.getElementById('importTrigger').addEventListener('click', ()=> document.getElementById('importInput').click());
 document.getElementById('importInput').addEventListener('change', (e)=>{
   const file = e.target.files[0]; if(!file) return;
   const reader = new FileReader();
@@ -542,14 +656,15 @@ document.getElementById('importInput').addEventListener('change', (e)=>{
       if(confirm('현재 데이터를 덮어쓰고 불러올까요?')){ state = data; persist(); render(); }
     }catch(err){ alert('파일을 읽는 중 오류가 발생했습니다.'); }
   };
-  reader.readAsText(file); e.target.value='';
+  reader.readAsText(file); e.target.value=''; menuDropdown.classList.remove('open');
 });
 document.getElementById('clearBtn').addEventListener('click', ()=>{
   if(confirm('정말 모든 데이터를 삭제할까요? 이 작업은 되돌릴 수 없습니다.')){ state = {subjects:[], entries:{}, lastSaved:null}; persist(); render(); }
+  menuDropdown.classList.remove('open');
 });
 
 function loadSample(){
-  if(state.subjects.length > 0 && !confirm('현재 데이터가 있습니다. 예시 데이터로 덮어쓸까요?')) return;
+  if(state.subjects.length > 0 && !confirm('현재 데이터가 있습니다. 예시 데이터로 덮어쓸까요?')) { menuDropdown.classList.remove('open'); return; }
   const s1={id:uid('subj'),name:'통합과학',collapsed:false}, s2={id:uid('subj'),name:'화법과 작문',collapsed:false}, s3={id:uid('subj'),name:'한국사',collapsed:false};
   state.subjects=[s1,s2,s3]; state.entries={};
   const e1={id:uid('entry'),subjectId:s1.id,semId:'g1-1',title:'교내 과학탐구발표대회 참가',content:'대기 중 미세먼지 농도와 호흡기 질환의 상관관계를 주제로 조사, 발표함.',award:true,awardName:'우수상',memo:'2학년 화학 세특과 연결 가능. 자소서 1번에 활용 예정.',files:[],links:[{url:'https://www.narastat.kr'}],connections:[]};
@@ -558,7 +673,7 @@ function loadSample(){
   const e4={id:uid('entry'),subjectId:s3.id,semId:'g2-2',title:'한국 근현대사 프로젝트 발표',content:'일제강점기 경제수탈 정책을 주제로 발표자료 제작 및 발표 진행.',award:false,awardName:'',memo:'',files:[],links:[],connections:[]};
   [e1,e2,e3,e4].forEach(e=> state.entries[e.id]=e);
   e1.connections=[e2.id,e3.id]; e2.connections=[e1.id]; e3.connections=[e1.id];
-  persist(); render();
+  persist(); render(); menuDropdown.classList.remove('open');
 }
 document.getElementById('loadSampleBtn').addEventListener('click', loadSample);
 

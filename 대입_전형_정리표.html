@@ -3,184 +3,225 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>대입 전형 정리표 — 나의 지원 전략</title>
+<title>대입 전형 정리표</title>
 <style>
   :root{
-    --paper:#f4efe4; --paper-line:#d9cfb8; --ink:#1e2a3a; --ink-soft:#4a5568;
-    --navy:#233350; --navy-deep:#141f33; --seal:#9b2c2c; --seal-soft:#c05656; --gold:#b08d3e;
-    --card:#fffdf7; --shadow:0 2px 8px rgba(30,42,58,0.12);
-    --green:#2f7a4d; --green-bg:#e5f3ea; --amber:#b3801a; --amber-bg:#fbf1dc;
-    --red:#b3392f; --red-bg:#f8e6e3; --gray:#8a94a6; --gray-bg:#eceff3;
-    font-family:'Noto Serif KR','Georgia',serif;
+    --bg:#ffffff; --bg-soft:#fafafa; --border:#e6e6e6; --border-soft:#f0f0f0;
+    --text:#1a1a1a; --text-soft:#6b6b6b; --text-faint:#9a9a9a;
+    --accent:#d97757; --accent-soft:#fbeee7; --accent-deep:#b5583a;
+    --green:#2f8a56; --green-bg:#e7f5ec; --amber:#b8860b; --amber-bg:#fbf3d9;
+    --red:#c0392b; --red-bg:#fbe9e7; --gray:#8a94a6; --gray-bg:#eef0f3;
+    --radius:10px; --shadow-sm:0 1px 2px rgba(0,0,0,0.04); --shadow-md:0 4px 14px rgba(0,0,0,0.08);
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   }
   *{box-sizing:border-box;}
-  body{ margin:0; background:linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 250px, var(--paper) 250px);
-    color:var(--ink); font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif; min-height:100vh; }
-  header{ padding:24px 32px 18px; color:#f4efe4; }
-  header .eyebrow{ font-family:'Noto Serif KR',serif; letter-spacing:.35em; font-size:11px; color:var(--gold); text-transform:uppercase; margin-bottom:6px; }
-  .headtop{ display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; }
-  header h1{ font-family:'Noto Serif KR',serif; font-size:26px; margin:0 0 4px; font-weight:700; }
-  header p{ margin:0; font-size:13px; color:#c9d2e0; }
-  .toolbar{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center; }
-  button, .btn{ font-family:inherit; font-size:12.5px; border:1px solid rgba(244,239,228,0.35);
-    background:rgba(244,239,228,0.08); color:#f4efe4; padding:8px 14px; border-radius:5px; cursor:pointer; transition:.15s; }
-  button:hover{background:rgba(244,239,228,0.2);}
-  button.primary{ background:var(--gold); border-color:var(--gold); color:#1e1608; font-weight:600; }
-  button.primary:hover{background:#c49f4c;}
-  button.danger{border-color:rgba(192,86,86,.6); color:#f3c6c6;}
-  button.danger:hover{background:rgba(192,86,86,.25);}
-  button.nav-link{ background:var(--navy-deep); border-color:#3a4a68; color:#fff; font-weight:600; }
-  button.active-tab{ background:var(--gold); color:#1e1608; border-color:var(--gold); font-weight:700; }
+  body{ margin:0; background:var(--bg-soft); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
 
-  .authbar{ display:flex; align-items:center; gap:10px; font-size:12px; color:#dfe6f2; background:rgba(0,0,0,.18); padding:8px 12px; border-radius:20px; }
-  .authbar .dot{width:8px;height:8px;border-radius:50%; background:#888;}
-  .authbar .dot.on{background:#57c26a;}
-  .authbar input{ border:1px solid rgba(255,255,255,.3); background:rgba(255,255,255,.08); color:#fff; padding:5px 8px; border-radius:4px; font-size:12px; width:130px;}
-  .savebar{ display:flex; align-items:center; gap:8px; font-size:11.5px; color:#c9d2e0; margin-top:8px; flex-wrap:wrap; }
-  .savebar .pill{ background:rgba(244,239,228,0.1); padding:4px 10px; border-radius:12px; }
+  header{ background:var(--bg); border-bottom:1px solid var(--border); padding:16px 28px; position:sticky; top:0; z-index:30; }
+  .headrow{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .mark{ width:30px; height:30px; border-radius:8px; background:var(--accent); display:flex; align-items:center; justify-content:center; color:#fff; }
+  .brand .titles h1{ font-size:16px; margin:0; font-weight:700; letter-spacing:-.01em; }
+  .brand .titles p{ font-size:12px; margin:0; color:var(--text-soft); }
+  .headright{ display:flex; align-items:center; gap:10px; }
 
-  .tabs{ display:flex; gap:8px; margin-top:12px; }
+  button{ font-family:inherit; cursor:pointer; }
+  .btn{ font-size:13px; border:1px solid var(--border); background:#fff; color:var(--text); padding:8px 14px; border-radius:8px; transition:.12s; }
+  .btn:hover{ background:var(--bg-soft); border-color:#d8d8d8; }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  .btn.primary:hover{ background:var(--accent-deep); border-color:var(--accent-deep); }
+  .btn.subtle{ background:transparent; border:none; color:var(--text-soft); padding:8px 10px; }
+  .btn.subtle:hover{ background:var(--bg-soft); color:var(--text); }
+  .btn.danger-text{ color:var(--red); }
 
-  .content-wrap{ padding:20px 32px 80px; }
+  .google-btn{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; border:1px solid var(--border); background:#fff; padding:8px 14px; border-radius:8px; }
+  .google-btn:hover{ background:var(--bg-soft); }
+  .google-g{ width:16px; height:16px; }
+  .userchip{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-soft); background:var(--bg-soft); padding:6px 12px; border-radius:20px; border:1px solid var(--border); }
+  .userchip .dot{ width:7px; height:7px; border-radius:50%; background:#3aa76d; }
 
-  /* ---- list view ---- */
-  .filters{ display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; font-size:12.5px; color:var(--ink-soft);}
-  .filters select{ padding:6px 8px; border-radius:5px; border:1px solid var(--paper-line); font-family:inherit; background:var(--card); }
+  .menu-wrap{ position:relative; }
+  .menu-btn{ width:36px; height:36px; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .menu-btn:hover{ background:var(--bg-soft); }
+  .menu-dropdown{ position:absolute; right:0; top:44px; background:#fff; border:1px solid var(--border); border-radius:10px; box-shadow:var(--shadow-md); width:230px; padding:6px; display:none; z-index:40; }
+  .menu-dropdown.open{ display:block; }
+  .menu-item{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:9px 10px; border-radius:7px; border:none; background:none; font-size:13px; color:var(--text); }
+  .menu-item:hover{ background:var(--bg-soft); }
+  .menu-item.danger{ color:var(--red); }
+  .menu-sep{ height:1px; background:var(--border-soft); margin:6px 4px; }
+  .menu-hidden-input{ display:none; }
 
-  .uni-group{ margin-bottom:22px; }
-  .uni-group h2{ font-family:'Noto Serif KR',serif; font-size:18px; color:var(--navy-deep); margin:0 0 8px;
-    border-bottom:2px solid var(--navy-deep); padding-bottom:4px; display:flex; align-items:center; gap:8px;}
-  .uni-group h2 .count{ font-size:11px; color:var(--ink-soft); font-weight:400; }
+  .subheadrow{ display:flex; align-items:center; justify-content:space-between; margin-top:12px; flex-wrap:wrap; gap:10px; }
+  .toolbar-left{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .tabs{ display:flex; gap:6px; }
+  .tabs button{ font-size:13px; padding:7px 14px; border-radius:8px; border:1px solid var(--border); background:#fff; color:var(--text-soft); }
+  .tabs button.active-tab{ background:var(--text); color:#fff; border-color:var(--text); font-weight:600; }
+  .savebar{ display:flex; gap:8px; font-size:11.5px; color:var(--text-faint); }
+  .savebar .pill{ background:var(--bg-soft); border:1px solid var(--border-soft); padding:3px 9px; border-radius:12px; }
 
-  .cards-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:14px; }
-  .adm-card{ background:var(--card); border:1px solid var(--paper-line); border-radius:8px; padding:14px 16px;
-    box-shadow:var(--shadow); cursor:pointer; position:relative; border-left:6px solid var(--gray); transition:.15s; }
-  .adm-card:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.12); }
-  .adm-card.prob-상{ border-left-color:var(--green); }
-  .adm-card.prob-중{ border-left-color:var(--amber); }
-  .adm-card.prob-하{ border-left-color:var(--red); }
-  .adm-card .badge{ display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:10px; margin-bottom:6px; }
+  .content-wrap{ padding:22px 28px 80px; }
+
+  .filters{ display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; font-size:12.5px; color:var(--text-soft);}
+  .filters select{ padding:7px 9px; border-radius:8px; border:1px solid var(--border); font-family:inherit; background:#fff; }
+
+  .uni-group{ margin-bottom:26px; }
+  .uni-group h2{ font-size:16px; font-weight:700; color:var(--text); margin:0 0 10px; display:flex; align-items:center; gap:8px; }
+  .uni-group h2 .count{ font-size:11.5px; color:var(--text-faint); font-weight:400; }
+
+  .cards-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(290px, 1fr)); gap:14px; }
+  .adm-card{ background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px 17px;
+    box-shadow:var(--shadow-sm); cursor:pointer; position:relative; transition:.14s; }
+  .adm-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow-md); border-color:#d8d8d8; }
+  .adm-card .stripe{ position:absolute; left:0; top:12px; bottom:12px; width:3px; border-radius:3px; background:var(--gray); }
+  .adm-card.prob-상 .stripe{ background:var(--green); }
+  .adm-card.prob-중 .stripe{ background:var(--amber); }
+  .adm-card.prob-하 .stripe{ background:var(--red); }
+  .adm-card .badge{ display:inline-block; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:10px; margin-bottom:8px; }
   .badge.prob-상{ background:var(--green-bg); color:var(--green); }
   .badge.prob-중{ background:var(--amber-bg); color:var(--amber); }
   .badge.prob-하{ background:var(--red-bg); color:var(--red); }
   .badge.prob-미정{ background:var(--gray-bg); color:var(--gray); }
-  .adm-card .type{ font-size:11px; color:var(--ink-soft); margin-bottom:2px; }
-  .adm-card .dept{ font-size:15px; font-weight:700; color:var(--navy-deep); margin-bottom:6px; }
-  .adm-card .metaline{ font-size:11px; color:var(--ink-soft); display:flex; flex-wrap:wrap; gap:6px 10px; margin-top:8px; }
-  .adm-card .metaline span{ background:#f3ede0; padding:2px 7px; border-radius:4px; }
-  .adm-card .cardtag{ position:absolute; top:12px; right:12px; font-size:10px; color:var(--seal); font-weight:700; }
+  .adm-card .type{ font-size:11.5px; color:var(--text-soft); margin-bottom:2px; }
+  .adm-card .dept{ font-size:15.5px; font-weight:700; color:var(--text); margin-bottom:8px; }
+  .adm-card .metaline{ font-size:11px; color:var(--text-soft); display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .adm-card .metaline span{ background:var(--bg-soft); padding:3px 8px; border-radius:5px; }
+  .adm-card .cardtag{ position:absolute; top:14px; right:14px; font-size:10px; color:var(--accent-deep); font-weight:700; background:var(--accent-soft); padding:2px 8px; border-radius:8px; }
 
-  .empty-note{padding:40px; text-align:center; color:var(--ink-soft); font-size:13px; background:var(--card); border-radius:8px; border:1px solid var(--paper-line); }
+  .empty-note{padding:50px 20px; text-align:center; color:var(--text-faint); font-size:13px; background:#fff; border-radius:var(--radius); border:1px solid var(--border); }
 
-  /* ---- calendar view ---- */
-  .cal-wrap{ background:var(--card); border:1px solid var(--paper-line); border-radius:8px; box-shadow:var(--shadow); padding:18px; }
-  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-  .cal-head h2{ font-family:'Noto Serif KR',serif; font-size:18px; color:var(--navy-deep); margin:0; }
+  .cal-wrap{ background:#fff; border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-sm); padding:20px; }
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .cal-head h2{ font-size:16px; font-weight:700; color:var(--text); margin:0; }
   .cal-nav{ display:flex; gap:6px; }
-  .cal-nav button{ color:var(--navy-deep); border:1px solid var(--paper-line); background:#fff; }
+  .cal-nav button{ color:var(--text); border:1px solid var(--border); background:#fff; width:32px; height:32px; border-radius:8px; }
+  .cal-nav button:hover{ background:var(--bg-soft); }
   .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; }
-  .cal-dow{ text-align:center; font-size:11px; color:var(--ink-soft); font-weight:700; padding:4px 0; }
-  .cal-day{ min-height:86px; border:1px solid var(--paper-line); border-radius:6px; padding:6px; font-size:11px; background:#fffef9; position:relative; }
-  .cal-day.other-month{ background:#f4efe4; opacity:.5; }
-  .cal-day .num{ font-weight:700; color:var(--navy-deep); font-size:12px; margin-bottom:4px; }
-  .cal-event{ font-size:10px; padding:2px 5px; border-radius:4px; margin-bottom:3px; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cal-dow{ text-align:center; font-size:11px; color:var(--text-faint); font-weight:700; padding:4px 0; }
+  .cal-day{ min-height:88px; border:1px solid var(--border-soft); border-radius:8px; padding:6px; font-size:11px; background:#fff; position:relative; }
+  .cal-day.other-month{ background:var(--bg-soft); opacity:.55; }
+  .cal-day .num{ font-weight:700; color:var(--text); font-size:12px; margin-bottom:4px; }
+  .cal-event{ font-size:10px; padding:3px 6px; border-radius:5px; margin-bottom:3px; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .cal-event.prob-상{ background:var(--green-bg); color:var(--green); }
   .cal-event.prob-중{ background:var(--amber-bg); color:var(--amber); }
   .cal-event.prob-하{ background:var(--red-bg); color:var(--red); }
   .cal-event.prob-미정{ background:var(--gray-bg); color:var(--gray); }
-  .cal-event.type-announce{ border-left:3px solid var(--navy); }
-  .cal-event.type-interview{ border-left:3px solid var(--seal); }
 
-  /* ---- modal ---- */
-  .modal-backdrop{ position:fixed; inset:0; background:rgba(20,31,51,0.55); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(20,20,20,0.35); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
   .modal-backdrop.open{display:flex;}
-  .modal{ background:var(--card); width:min(680px, 100%); max-height:90vh; overflow-y:auto; border-radius:8px; box-shadow:0 12px 40px rgba(0,0,0,.35); padding:22px 24px 24px; }
-  .modal h2{margin:0 0 4px; font-family:'Noto Serif KR',serif; font-size:19px; color:var(--navy-deep);}
-  .modal .sub{font-size:11.5px; color:var(--ink-soft); margin-bottom:16px;}
+  .modal{ background:#fff; width:min(680px, 100%); max-height:90vh; overflow-y:auto; border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,.18); padding:26px 28px; }
+  .modal h2{margin:0 0 4px; font-size:19px; font-weight:700; color:var(--text);}
+  .modal .sub{font-size:12px; color:var(--text-faint); margin-bottom:18px;}
+
+  .view-title{ font-size:20px; font-weight:700; margin-bottom:2px; }
+  .view-sub{ font-size:13px; color:var(--text-soft); margin-bottom:14px; }
+  .view-badge{ display:inline-block; font-size:11px; font-weight:700; padding:3px 10px; border-radius:12px; margin-bottom:12px; }
+  .view-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; margin-bottom:18px; }
+  .view-item .label{ font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:.03em; margin-bottom:3px; }
+  .view-item .val{ font-size:13.5px; color:var(--text); }
+  .view-section{ margin-bottom:16px; }
+  .view-section .label{ font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; }
+  .view-content{ font-size:13.5px; line-height:1.6; color:var(--text); white-space:pre-wrap; }
+  .view-empty{ color:var(--text-faint); font-size:13px; font-style:italic; }
+  .view-q{ background:var(--bg-soft); border-radius:8px; padding:9px 12px; margin-bottom:6px; font-size:13px; }
+
   .field{margin-bottom:14px;}
-  .field label{display:block; font-size:12px; font-weight:700; color:var(--navy); margin-bottom:5px;}
+  .field label{display:block; font-size:12.5px; font-weight:600; color:var(--text); margin-bottom:5px;}
   .field input[type=text], .field input[type=date], .field input[type=time], .field textarea, .field select{
-    width:100%; padding:8px 10px; border:1px solid var(--paper-line); border-radius:5px; font-family:inherit; font-size:13px; background:#fffef9; color:var(--ink); }
+    width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; background:#fff; color:var(--text); }
+  .field input:focus, .field textarea:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
   .field textarea{min-height:56px; resize:vertical;}
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
   .checkline{display:flex; align-items:center; gap:8px; font-size:12.5px;}
   .chip-toggle-group{display:flex; flex-wrap:wrap; gap:6px;}
-  .chip-toggle{ font-size:11.5px; background:#e6ecf5; color:var(--navy); border:1px solid #c7d3e6; padding:5px 10px; border-radius:12px; cursor:pointer; }
-  .chip-toggle.active{background:var(--navy); color:#fff;}
+  .chip-toggle{ font-size:11.5px; background:var(--bg-soft); color:var(--text-soft); border:1px solid var(--border); padding:6px 11px; border-radius:14px; cursor:pointer; }
+  .chip-toggle.active{background:var(--text); color:#fff; border-color:var(--text);}
   .q-item{ display:flex; gap:6px; margin-bottom:6px; }
   .q-item textarea{ flex:1; min-height:40px; }
-  .x-btn{background:none;border:none;color:var(--seal);cursor:pointer;font-size:14px;padding:0 6px;}
+  .x-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:0 6px;}
   .prob-select{ display:flex; gap:8px; }
-  .prob-opt{ flex:1; text-align:center; padding:8px; border-radius:6px; border:2px solid var(--paper-line); cursor:pointer; font-size:12.5px; font-weight:700; color:var(--ink-soft);}
+  .prob-opt{ flex:1; text-align:center; padding:9px; border-radius:8px; border:1.5px solid var(--border); cursor:pointer; font-size:12.5px; font-weight:700; color:var(--text-soft);}
   .prob-opt.sel-상.selected{ border-color:var(--green); background:var(--green-bg); color:var(--green); }
   .prob-opt.sel-중.selected{ border-color:var(--amber); background:var(--amber-bg); color:var(--amber); }
   .prob-opt.sel-하.selected{ border-color:var(--red); background:var(--red-bg); color:var(--red); }
   .prob-opt.sel-미정.selected{ border-color:var(--gray); background:var(--gray-bg); color:var(--gray); }
-  .modal-actions{display:flex; justify-content:space-between; margin-top:18px; gap:8px;}
+  .modal-actions{display:flex; justify-content:space-between; margin-top:20px; gap:8px;}
   .modal-actions .left{display:flex; gap:8px;}
-  button.ghost{background:transparent; border:1px solid var(--paper-line); color:var(--ink-soft);}
-  button.ghost:hover{background:#f3ede0;}
-  small.hint{color:var(--ink-soft); font-size:11px; display:block; margin-top:4px;}
+  small.hint{color:var(--text-faint); font-size:11px; display:block; margin-top:4px;}
 
-  footer{text-align:center; font-size:11px; color:var(--ink-soft); padding:20px;}
-  .save-indicator{ position:fixed; bottom:16px; right:16px; background:var(--navy); color:#f4efe4; font-size:11.5px;
-    padding:8px 14px; border-radius:20px; opacity:0; transition:opacity .3s; box-shadow:var(--shadow); z-index:60; }
+  footer{text-align:center; font-size:11.5px; color:var(--text-faint); padding:24px;}
+  .save-indicator{ position:fixed; bottom:20px; right:20px; background:var(--text); color:#fff; font-size:12px;
+    padding:9px 16px; border-radius:20px; opacity:0; transition:opacity .3s; box-shadow:var(--shadow-md); z-index:60; }
   .save-indicator.show{opacity:1;}
-  .save-indicator.error{background:var(--seal);}
+  .save-indicator.error{background:var(--red);}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="headtop">
-    <div>
-      <div class="eyebrow">ADMISSIONS STRATEGY BOARD</div>
-      <h1>나의 대입 전형 정리표</h1>
-      <p>대학 · 전형 · 학과별 상세 정보를 한눈에, 캘린더로 일정까지 관리</p>
+  <div class="headrow">
+    <div class="brand">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"></path>
+          <path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"></path>
+        </svg>
+      </div>
+      <div class="titles">
+        <h1>대입 전형 정리표</h1>
+        <p>대학 · 전형 · 학과별 정보와 일정 관리</p>
+      </div>
     </div>
-    <div class="authbar" id="authbar">
-      <span class="dot" id="authDot"></span>
-      <span id="authStatus">연결 확인 중...</span>
-      <input type="email" id="authEmail" placeholder="이메일">
-      <input type="password" id="authPw" placeholder="비밀번호">
-      <button id="loginBtn">로그인</button>
-      <button id="signupBtn">회원가입</button>
-      <button id="logoutBtn" style="display:none;">로그아웃</button>
+    <div class="headright">
+      <div id="signedOutBlock">
+        <button class="google-btn" id="googleLoginBtn">
+          <svg class="google-g" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.6C29.6 35.1 26.9 36 24 36c-5.3 0-9.7-3.4-11.3-8.1l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.5l6.6 5.6C39.9 37 44 31 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+          Google로 계속하기
+        </button>
+      </div>
+      <div id="signedInBlock" style="display:none;">
+        <div class="userchip"><span class="dot"></span><span id="userEmail"></span><button class="btn subtle" id="logoutBtn" style="padding:2px 6px;">로그아웃</button></div>
+      </div>
+      <div class="menu-wrap">
+        <button class="menu-btn" id="menuBtn">☰</button>
+        <div class="menu-dropdown" id="menuDropdown">
+          <button class="menu-item" id="loadSampleBtn">🧪 예시 데이터로 미리보기</button>
+          <button class="menu-item" id="exportBtn">⬇️ 백업 파일 다운로드</button>
+          <button class="menu-item" id="importTrigger">⬆️ 백업 파일 불러오기</button>
+          <input type="file" id="importInput" class="menu-hidden-input" accept="application/json">
+          <div class="menu-sep"></div>
+          <button class="menu-item" id="goLedgerBtn">📖 생기부 이력표로 이동</button>
+          <div class="menu-sep"></div>
+          <button class="menu-item danger" id="clearBtn">🗑 전체 초기화</button>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="toolbar">
-    <button class="primary" id="addAdmBtn">➕ 대학/전형 추가</button>
-    <button id="loadSampleBtn">🧪 예시 데이터로 미리보기</button>
-    <button id="exportBtn">💾 백업 파일 다운로드 (JSON)</button>
-    <label class="btn" style="display:inline-flex;align-items:center;">
-      📂 백업 파일 불러오기
-      <input type="file" id="importInput" accept="application/json" style="display:none;">
-    </label>
-    <button class="danger" id="clearBtn">🗑 전체 초기화</button>
-    <button class="nav-link" id="goLedgerBtn">📖 생기부 이력표로 돌아가기 ←</button>
-  </div>
-  <div class="tabs">
-    <button id="tabList" class="active-tab">📋 목록 보기</button>
-    <button id="tabCal">🗓 캘린더 보기</button>
-  </div>
-  <div class="savebar">
-    <span class="pill" id="saveTimestamp">아직 저장 기록 없음</span>
-    <span class="pill" id="cloudStatus">☁️ 클라우드: 미설정</span>
+  <div class="subheadrow">
+    <div class="toolbar-left">
+      <button class="btn primary" id="addAdmBtn">＋ 대학/전형 추가</button>
+      <div class="tabs">
+        <button id="tabList" class="active-tab">목록 보기</button>
+        <button id="tabCal">캘린더 보기</button>
+      </div>
+    </div>
+    <div class="savebar">
+      <span class="pill" id="saveTimestamp">저장 기록 없음</span>
+      <span class="pill" id="cloudStatus">클라우드 미설정</span>
+    </div>
   </div>
 </header>
 
 <div class="content-wrap">
-
   <div id="listView">
     <div class="filters">
-      <span>정렬:</span>
+      <span>정렬</span>
       <select id="sortSelect">
         <option value="prob">합격 가능성 높은 순</option>
         <option value="uni">대학 이름순</option>
         <option value="date">면접/발표일 순</option>
       </select>
-      <span>· 카드를 클릭하면 상세 정보를 편집할 수 있습니다.</span>
+      <span>· 카드를 클릭하면 상세 정보를 볼 수 있습니다</span>
     </div>
     <div id="listContainer"></div>
   </div>
@@ -195,78 +236,12 @@
       <div class="cal-grid" id="calGrid"></div>
     </div>
   </div>
-
 </div>
 
-<footer>로그인하면 데이터가 Firebase 클라우드에 저장되어 어떤 기기에서든 이어서 볼 수 있습니다. "생기부 이력표"와 같은 Firebase 계정으로 로그인하면 두 사이트가 같은 로그인 정보를 공유합니다 (데이터는 각 사이트별로 별도 저장됩니다).</footer>
+<footer>Google 계정으로 로그인하면 클라우드에 자동 저장됩니다. "생기부 이력표"와 같은 계정으로 로그인하면 로그인 정보를 공유합니다 (데이터는 사이트별로 분리 저장).</footer>
 
-<!-- Entry Modal -->
 <div class="modal-backdrop" id="modalBackdrop">
-  <div class="modal">
-    <h2 id="modalTitle">대학 / 전형 입력</h2>
-    <div class="sub">대학, 전형, 학과 단위로 하나씩 등록합니다. 같은 대학의 다른 전형/학과는 각각 따로 추가해주세요.</div>
-
-    <div class="row3">
-      <div class="field"><label>대학교</label><input type="text" id="f_uni" placeholder="예: 한국대학교"></div>
-      <div class="field"><label>전형 이름</label><input type="text" id="f_type" placeholder="예: 학생부종합(네오르네상스)"></div>
-      <div class="field"><label>지원 학과</label><input type="text" id="f_dept" placeholder="예: 경영학과"></div>
-    </div>
-
-    <div class="field checkline"><input type="checkbox" id="f_iscard"><label for="f_iscard" style="margin:0;">6장 지원 카드에 포함된 학교입니다 (미포함 시 특수 전형/추가 지원)</label></div>
-
-    <div class="row2">
-      <div class="field"><label>1차 서류 합격 배수</label><input type="text" id="f_round1" placeholder="예: 3배수"></div>
-      <div class="field"><label>면접 응시 배수</label><input type="text" id="f_ivratio" placeholder="예: 3배수"></div>
-    </div>
-
-    <div class="field checkline"><input type="checkbox" id="f_ivrequired"><label for="f_ivrequired" style="margin:0;">면접이 있습니다</label></div>
-    <div class="row3">
-      <div class="field"><label>면접 날짜</label><input type="date" id="f_ivdate"></div>
-      <div class="field"><label>면접 시간</label><input type="time" id="f_ivtime"></div>
-      <div class="field"><label>최종 발표일</label><input type="date" id="f_announce"></div>
-    </div>
-
-    <div class="field">
-      <label>면접 유형</label>
-      <div class="chip-toggle-group" id="ivTypeGroup">
-        <div class="chip-toggle" data-v="제시문 기반">제시문 기반</div>
-        <div class="chip-toggle" data-v="생기부 기반">생기부 기반</div>
-        <div class="chip-toggle" data-v="특수(영어면접 등)">특수(영어면접 등)</div>
-      </div>
-    </div>
-
-    <div class="row3">
-      <div class="field checkline"><input type="checkbox" id="f_choi"><label for="f_choi" style="margin:0;">수능 최저 있음</label></div>
-      <div class="field checkline"><input type="checkbox" id="f_rec"><label for="f_rec" style="margin:0;">추천서 필요</label></div>
-      <div class="field checkline"><input type="checkbox" id="f_selfintro"><label for="f_selfintro" style="margin:0;">자기소개서 필요</label></div>
-    </div>
-    <div class="field"><label>수능 최저 기준 (해당 시)</label><input type="text" id="f_choitext" placeholder="예: 국,수,영,탐 중 2개 합 5 이내"></div>
-
-    <div class="field" id="selfIntroBlock">
-      <label>자소서 문항</label>
-      <div id="qList"></div>
-      <button class="ghost" id="addQBtn" type="button">+ 문항 추가</button>
-    </div>
-
-    <div class="field"><label>작년 입시결과 / 수시컷 참고 (선택)</label><input type="text" id="f_cutoff" placeholder="예: 작년 최종등록 평균 2.3등급, 경쟁률 8:1"></div>
-
-    <div class="field">
-      <label>합격 가능성 (내 판단)</label>
-      <div class="prob-select">
-        <div class="prob-opt sel-상" data-v="상">상 (가능성 높음)</div>
-        <div class="prob-opt sel-중" data-v="중">중 (도전권)</div>
-        <div class="prob-opt sel-하" data-v="하">하 (소신/상향)</div>
-        <div class="prob-opt sel-미정" data-v="미정">미정</div>
-      </div>
-    </div>
-
-    <div class="field"><label>메모</label><textarea id="f_memo" placeholder="전략 메모, 준비할 것, 특이사항 등"></textarea></div>
-
-    <div class="modal-actions">
-      <div class="left"><button class="danger" id="deleteAdmBtn">삭제</button></div>
-      <div class="left"><button class="ghost" id="cancelBtn">취소</button><button class="primary" id="saveAdmBtn">저장</button></div>
-    </div>
-  </div>
+  <div class="modal" id="modalBody"></div>
 </div>
 
 <div class="save-indicator" id="saveIndicator">저장됨</div>
@@ -278,10 +253,10 @@
 <script>
 const STORAGE_KEY = 'admissions_board_v1';
 let state = loadLocal() || { admissions: {}, lastSaved: null };
-let editingId = null;
+let editingId = null, modalMode = 'view';
 let tempIvTypes = [], tempQuestions = [], tempProb = '미정';
 let currentView = 'list';
-let calYear, calMonth; // 0-indexed month
+let calYear, calMonth;
 
 function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
 function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -292,51 +267,33 @@ try{
   if(firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('여기에')){
     firebase.initializeApp(firebaseConfig);
     fbAuth = firebase.auth(); fbDb = firebase.firestore(); cloudReady = true;
-    document.getElementById('cloudStatus').textContent = '☁️ 클라우드: 연결됨';
+    document.getElementById('cloudStatus').textContent = '클라우드 연결됨';
   }else{
-    document.getElementById('cloudStatus').textContent = '☁️ 클라우드: 설정 안 됨';
-    document.getElementById('authStatus').textContent = '클라우드 미설정 (로컬 저장만 사용)';
+    document.getElementById('cloudStatus').textContent = '클라우드 설정 안 됨';
   }
-}catch(e){ document.getElementById('cloudStatus').textContent='☁️ 클라우드: 연결 실패'; console.error(e); }
+}catch(e){ document.getElementById('cloudStatus').textContent='클라우드 연결 실패'; console.error(e); }
 
 if(cloudReady){
   fbAuth.onAuthStateChanged(async (user)=>{
     currentUser = user;
-    const dot = document.getElementById('authDot');
     if(user){
-      dot.classList.add('on');
-      document.getElementById('authStatus').textContent = user.email;
-      document.getElementById('loginBtn').style.display='none';
-      document.getElementById('signupBtn').style.display='none';
-      document.getElementById('logoutBtn').style.display='inline-block';
-      document.getElementById('authEmail').style.display='none';
-      document.getElementById('authPw').style.display='none';
+      document.getElementById('signedOutBlock').style.display='none';
+      document.getElementById('signedInBlock').style.display='block';
+      document.getElementById('userEmail').textContent = user.email || user.displayName || '로그인됨';
       await loadFromCloud();
     }else{
-      dot.classList.remove('on');
-      document.getElementById('authStatus').textContent = '로그인 안 함 (로컬에만 저장됨)';
-      document.getElementById('loginBtn').style.display='inline-block';
-      document.getElementById('signupBtn').style.display='inline-block';
-      document.getElementById('logoutBtn').style.display='none';
-      document.getElementById('authEmail').style.display='inline-block';
-      document.getElementById('authPw').style.display='inline-block';
+      document.getElementById('signedOutBlock').style.display='block';
+      document.getElementById('signedInBlock').style.display='none';
       renderAll();
     }
   });
-  document.getElementById('loginBtn').addEventListener('click', async ()=>{
-    const email=document.getElementById('authEmail').value.trim(), pw=document.getElementById('authPw').value;
-    if(!email||!pw) return alert('이메일/비밀번호를 입력하세요.');
-    try{ await fbAuth.signInWithEmailAndPassword(email, pw); }catch(e){ alert('로그인 실패: '+e.message); }
-  });
-  document.getElementById('signupBtn').addEventListener('click', async ()=>{
-    const email=document.getElementById('authEmail').value.trim(), pw=document.getElementById('authPw').value;
-    if(!email||!pw) return alert('이메일/비밀번호를 입력하세요.');
-    if(pw.length<6) return alert('비밀번호는 6자 이상이어야 합니다.');
-    try{ await fbAuth.createUserWithEmailAndPassword(email, pw); alert('회원가입 완료!'); }catch(e){ alert('회원가입 실패: '+e.message); }
+  document.getElementById('googleLoginBtn').addEventListener('click', async ()=>{
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try{ await fbAuth.signInWithPopup(provider); }catch(e){ alert('로그인 실패: '+e.message); }
   });
   document.getElementById('logoutBtn').addEventListener('click', ()=> fbAuth.signOut());
 }else{
-  document.getElementById('authbar').style.display='none';
+  document.getElementById('signedOutBlock').style.display='none';
 }
 
 async function loadFromCloud(){
@@ -367,13 +324,19 @@ async function persist(){
 }
 function updateTimestamp(){
   const el = document.getElementById('saveTimestamp');
-  el.textContent = state.lastSaved ? '🕒 마지막 저장: ' + new Date(state.lastSaved).toLocaleString('ko-KR') : '아직 저장 기록 없음';
+  el.textContent = state.lastSaved ? '마지막 저장 ' + new Date(state.lastSaved).toLocaleString('ko-KR') : '저장 기록 없음';
 }
 function showIndicator(msg, isError){
   const ind = document.getElementById('saveIndicator');
   ind.textContent = msg; ind.classList.toggle('error', !!isError); ind.classList.add('show');
-  clearTimeout(showIndicator._t); showIndicator._t = setTimeout(()=>ind.classList.remove('show'), 1600);
+  clearTimeout(showIndicator._t); showIndicator._t = setTimeout(()=>ind.classList.remove('show'), 1500);
 }
+
+/* ---------- menu ---------- */
+const menuBtn = document.getElementById('menuBtn'), menuDropdown = document.getElementById('menuDropdown');
+menuBtn.addEventListener('click', (e)=>{ e.stopPropagation(); menuDropdown.classList.toggle('open'); });
+document.addEventListener('click', ()=> menuDropdown.classList.remove('open'));
+menuDropdown.addEventListener('click', (e)=> e.stopPropagation());
 
 /* ---------- tabs ---------- */
 document.getElementById('tabList').addEventListener('click', ()=>{
@@ -387,11 +350,9 @@ document.getElementById('tabCal').addEventListener('click', ()=>{
 });
 document.getElementById('goLedgerBtn').addEventListener('click', ()=> window.open('./생기부_정리표.html','_blank'));
 
-/* ---------- render list ---------- */
+/* ---------- list ---------- */
 const PROB_ORDER = {'상':0,'중':1,'하':2,'미정':3};
-
 function renderAll(){ renderList(); updateTimestamp(); if(currentView==='cal') renderCalendar(); }
-
 document.getElementById('sortSelect').addEventListener('change', renderList);
 
 function renderList(){
@@ -399,35 +360,29 @@ function renderList(){
   container.innerHTML = '';
   const all = Object.values(state.admissions);
   if(all.length === 0){
-    container.innerHTML = '<div class="empty-note">아직 등록된 대학/전형이 없습니다. "대학/전형 추가" 버튼을 누르거나 "예시 데이터로 미리보기"를 눌러보세요.</div>';
+    container.innerHTML = '<div class="empty-note">아직 등록된 대학/전형이 없습니다. "대학/전형 추가"를 누르거나 메뉴에서 예시 데이터를 불러와보세요.</div>';
     return;
   }
   const sortMode = document.getElementById('sortSelect').value;
-
-  // group by university
   const byUni = {};
   all.forEach(a=>{ (byUni[a.university] = byUni[a.university]||[]).push(a); });
-
   let uniNames = Object.keys(byUni);
   if(sortMode==='uni'){ uniNames.sort((a,b)=>a.localeCompare(b,'ko')); }
   else{
-    // sort universities by their best (lowest) probability rank
     uniNames.sort((a,b)=>{
       const ra = Math.min(...byUni[a].map(x=>PROB_ORDER[x.probability||'미정']));
       const rb = Math.min(...byUni[b].map(x=>PROB_ORDER[x.probability||'미정']));
       return ra-rb;
     });
   }
-
   uniNames.forEach(uniName=>{
     let list = byUni[uniName].slice();
     if(sortMode==='prob'){ list.sort((a,b)=>PROB_ORDER[a.probability||'미정']-PROB_ORDER[b.probability||'미정']); }
     else if(sortMode==='date'){ list.sort((a,b)=> (a.interviewDate||a.announceDate||'9999').localeCompare(b.interviewDate||b.announceDate||'9999')); }
 
     const group = document.createElement('div'); group.className='uni-group';
-    group.innerHTML = `<h2>${escapeHtml(uniName)} <span class="count">(${list.length}개 전형/학과)</span></h2>`;
+    group.innerHTML = `<h2>${escapeHtml(uniName)} <span class="count">${list.length}개</span></h2>`;
     const grid = document.createElement('div'); grid.className='cards-grid';
-
     list.forEach(a=>{
       const card = document.createElement('div');
       card.className = 'adm-card prob-' + (a.probability||'미정');
@@ -440,13 +395,14 @@ function renderList(){
       if(a.recommendation) meta.push('추천서 O');
       if(a.selfIntroRequired) meta.push('자소서 O');
       card.innerHTML = `
-        ${a.isCardSchool ? '<div class="cardtag">6장 카드</div>' : '<div class="cardtag" style="color:var(--ink-soft);">추가 지원</div>'}
+        <div class="stripe"></div>
+        ${a.isCardSchool ? '<div class="cardtag">6장 카드</div>' : ''}
         <span class="badge prob-${a.probability||'미정'}">${a.probability||'미정'}</span>
         <div class="type">${escapeHtml(a.admissionType||'전형명 미입력')}</div>
         <div class="dept">${escapeHtml(a.department||'학과 미입력')}</div>
         <div class="metaline">${meta.map(m=>`<span>${escapeHtml(m)}</span>`).join('')}</div>
       `;
-      card.addEventListener('click', ()=> openModal(a.id));
+      card.addEventListener('click', ()=> openModal(a.id, 'view'));
       grid.appendChild(card);
     });
     group.appendChild(grid);
@@ -463,28 +419,24 @@ function renderCalendar(){
   ['일','월','화','수','목','금','토'].forEach(d=>{
     const el = document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el);
   });
-
   const firstDay = new Date(calYear, calMonth, 1);
   const startWeekday = firstDay.getDay();
   const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
   const daysInPrevMonth = new Date(calYear, calMonth, 0).getDate();
-
-  // build event map: dateStr -> [events]
   const events = {};
   Object.values(state.admissions).forEach(a=>{
     if(a.interviewRequired && a.interviewDate){
-      (events[a.interviewDate] = events[a.interviewDate]||[]).push({label:`🎤 ${a.university} 면접`, prob:a.probability||'미정', type:'interview', id:a.id});
+      (events[a.interviewDate] = events[a.interviewDate]||[]).push({label:`🎤 ${a.university} 면접`, prob:a.probability||'미정', id:a.id});
     }
     if(a.announceDate){
-      (events[a.announceDate] = events[a.announceDate]||[]).push({label:`📢 ${a.university} 발표`, prob:a.probability||'미정', type:'announce', id:a.id});
+      (events[a.announceDate] = events[a.announceDate]||[]).push({label:`📢 ${a.university} 발표`, prob:a.probability||'미정', id:a.id});
     }
   });
-
   const totalCells = Math.ceil((startWeekday + daysInMonth) / 7) * 7;
   for(let i=0;i<totalCells;i++){
     const dayNum = i - startWeekday + 1;
     const cell = document.createElement('div'); cell.className='cal-day';
-    let realDate, label;
+    let realDate;
     if(dayNum < 1){ realDate = new Date(calYear, calMonth-1, daysInPrevMonth+dayNum); cell.classList.add('other-month'); }
     else if(dayNum > daysInMonth){ realDate = new Date(calYear, calMonth+1, dayNum-daysInMonth); cell.classList.add('other-month'); }
     else{ realDate = new Date(calYear, calMonth, dayNum); }
@@ -492,10 +444,9 @@ function renderCalendar(){
     cell.innerHTML = `<div class="num">${realDate.getDate()}</div>`;
     (events[dateStr]||[]).forEach(ev=>{
       const evEl = document.createElement('div');
-      evEl.className = `cal-event prob-${ev.prob} type-${ev.type}`;
-      evEl.textContent = ev.label;
-      evEl.title = ev.label;
-      evEl.addEventListener('click', ()=> openModal(ev.id));
+      evEl.className = `cal-event prob-${ev.prob}`;
+      evEl.textContent = ev.label; evEl.title = ev.label;
+      evEl.addEventListener('click', ()=> openModal(ev.id, 'view'));
       cell.appendChild(evEl);
     });
     grid.appendChild(cell);
@@ -505,67 +456,203 @@ document.getElementById('calPrev').addEventListener('click', ()=>{ calMonth--; i
 document.getElementById('calNext').addEventListener('click', ()=>{ calMonth++; if(calMonth>11){calMonth=0; calYear++;} renderCalendar(); });
 
 /* ---------- modal ---------- */
-function openModal(id){
-  editingId = id;
+function openModal(id, mode){
+  editingId = id; modalMode = mode;
   document.getElementById('modalBackdrop').classList.add('open');
+  if(mode==='view') renderViewMode(); else renderEditMode();
+}
+function closeModal(){ document.getElementById('modalBackdrop').classList.remove('open'); editingId=null; }
+document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='modalBackdrop') closeModal(); });
+document.getElementById('addAdmBtn').addEventListener('click', ()=> openModal(null, 'edit'));
+
+function renderViewMode(){
+  const a = state.admissions[editingId];
+  const modal = document.getElementById('modalBody');
+  const ivTypes = (a.interviewTypes||[]).join(' · ') || '해당 없음';
+  const questions = (a.selfIntroQuestions||[]);
+  modal.innerHTML = `
+    <span class="view-badge badge prob-${a.probability||'미정'}">합격 가능성: ${a.probability||'미정'}</span>
+    ${a.isCardSchool ? '<span class="view-badge" style="background:var(--accent-soft); color:var(--accent-deep); margin-left:6px;">6장 카드 포함</span>' : '<span class="view-badge" style="background:var(--gray-bg); color:var(--gray); margin-left:6px;">추가 지원</span>'}
+    <div class="view-title">${escapeHtml(a.university)}</div>
+    <div class="view-sub">${escapeHtml(a.admissionType)} · ${escapeHtml(a.department)}</div>
+
+    <div class="view-grid">
+      <div class="view-item"><div class="label">1차 서류 배수</div><div class="val">${escapeHtml(a.round1Ratio)||'-'}</div></div>
+      <div class="view-item"><div class="label">면접 응시 배수</div><div class="val">${escapeHtml(a.interviewRatio)||'-'}</div></div>
+      <div class="view-item"><div class="label">면접 여부</div><div class="val">${a.interviewRequired ? '있음' : '없음'}</div></div>
+      <div class="view-item"><div class="label">면접 일시</div><div class="val">${a.interviewDate ? (a.interviewDate + ' ' + (a.interviewTime||'')) : '-'}</div></div>
+      <div class="view-item"><div class="label">면접 유형</div><div class="val">${escapeHtml(ivTypes)}</div></div>
+      <div class="view-item"><div class="label">최종 발표일</div><div class="val">${a.announceDate || '-'}</div></div>
+      <div class="view-item"><div class="label">수능 최저</div><div class="val">${a.suneungChoi ? (escapeHtml(a.suneungChoiText)||'있음') : '없음'}</div></div>
+      <div class="view-item"><div class="label">추천서</div><div class="val">${a.recommendation ? '필요' : '불필요'}</div></div>
+    </div>
+
+    <div class="view-section">
+      <div class="label">자기소개서</div>
+      ${ a.selfIntroRequired ? (questions.length ? questions.map(q=>`<div class="view-q">${escapeHtml(q)}</div>`).join('') : '<span class="view-empty">필요하지만 문항 미입력</span>') : '<span class="view-empty">필요 없음</span>' }
+    </div>
+
+    <div class="view-section">
+      <div class="label">작년 입시결과 / 참고사항</div>
+      <div class="view-content">${a.cutoffNote ? escapeHtml(a.cutoffNote) : '<span class="view-empty">입력된 내용이 없습니다.</span>'}</div>
+    </div>
+
+    <div class="view-section">
+      <div class="label">메모</div>
+      <div class="view-content">${a.memo ? escapeHtml(a.memo) : '<span class="view-empty">작성된 메모가 없습니다.</span>'}</div>
+    </div>
+
+    <div class="modal-actions">
+      <div class="left"><button class="btn danger-text" id="vDeleteBtn">삭제</button></div>
+      <div class="left"><button class="btn" id="vCloseBtn">닫기</button><button class="btn primary" id="vEditBtn">✏️ 수정</button></div>
+    </div>
+  `;
+  document.getElementById('vCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('vEditBtn').addEventListener('click', ()=>{ modalMode='edit'; renderEditMode(); });
+  document.getElementById('vDeleteBtn').addEventListener('click', ()=>{
+    if(!confirm('이 항목을 삭제할까요?')) return;
+    delete state.admissions[editingId]; persist(); closeModal(); renderAll();
+  });
+}
+
+function renderEditMode(){
+  const isNew = !editingId;
   let a;
-  if(id){ a = state.admissions[id]; document.getElementById('modalTitle').textContent='대학 / 전형 편집'; document.getElementById('deleteAdmBtn').style.display='inline-block'; }
+  if(!isNew){ a = state.admissions[editingId]; }
   else{ a = { university:'', admissionType:'', department:'', isCardSchool:true, round1Ratio:'', interviewRatio:'',
     interviewRequired:false, interviewDate:'', interviewTime:'', announceDate:'', interviewTypes:[],
     suneungChoi:false, suneungChoiText:'', recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
-    cutoffNote:'', probability:'미정', memo:'' };
-    document.getElementById('modalTitle').textContent='새 대학 / 전형 입력'; document.getElementById('deleteAdmBtn').style.display='none'; }
-
-  document.getElementById('f_uni').value = a.university||'';
-  document.getElementById('f_type').value = a.admissionType||'';
-  document.getElementById('f_dept').value = a.department||'';
-  document.getElementById('f_iscard').checked = a.isCardSchool!==false;
-  document.getElementById('f_round1').value = a.round1Ratio||'';
-  document.getElementById('f_ivratio').value = a.interviewRatio||'';
-  document.getElementById('f_ivrequired').checked = !!a.interviewRequired;
-  document.getElementById('f_ivdate').value = a.interviewDate||'';
-  document.getElementById('f_ivtime').value = a.interviewTime||'';
-  document.getElementById('f_announce').value = a.announceDate||'';
-  document.getElementById('f_choi').checked = !!a.suneungChoi;
-  document.getElementById('f_choitext').value = a.suneungChoiText||'';
-  document.getElementById('f_rec').checked = !!a.recommendation;
-  document.getElementById('f_selfintro').checked = !!a.selfIntroRequired;
-  document.getElementById('f_cutoff').value = a.cutoffNote||'';
-  document.getElementById('f_memo').value = a.memo||'';
+    cutoffNote:'', probability:'미정', memo:'' }; }
 
   tempIvTypes = (a.interviewTypes||[]).slice();
   tempQuestions = (a.selfIntroQuestions||[]).slice();
   tempProb = a.probability || '미정';
 
+  const modal = document.getElementById('modalBody');
+  modal.innerHTML = `
+    <h2>${isNew ? '새 대학 / 전형 입력' : '대학 / 전형 편집'}</h2>
+    <div class="sub">대학, 전형, 학과 단위로 하나씩 등록합니다. 같은 대학의 다른 전형/학과는 각각 따로 추가해주세요.</div>
+
+    <div class="row3">
+      <div class="field"><label>대학교</label><input type="text" id="f_uni" placeholder="예: 한국대학교" value="${escapeHtml(a.university)}"></div>
+      <div class="field"><label>전형 이름</label><input type="text" id="f_type" placeholder="예: 학생부종합" value="${escapeHtml(a.admissionType)}"></div>
+      <div class="field"><label>지원 학과</label><input type="text" id="f_dept" placeholder="예: 경영학과" value="${escapeHtml(a.department)}"></div>
+    </div>
+
+    <div class="field checkline"><input type="checkbox" id="f_iscard" ${a.isCardSchool!==false?'checked':''}><label for="f_iscard" style="margin:0;">6장 지원 카드에 포함된 학교입니다</label></div>
+
+    <div class="row2">
+      <div class="field"><label>1차 서류 합격 배수</label><input type="text" id="f_round1" placeholder="예: 3배수" value="${escapeHtml(a.round1Ratio)}"></div>
+      <div class="field"><label>면접 응시 배수</label><input type="text" id="f_ivratio" placeholder="예: 3배수" value="${escapeHtml(a.interviewRatio)}"></div>
+    </div>
+
+    <div class="field checkline"><input type="checkbox" id="f_ivrequired" ${a.interviewRequired?'checked':''}><label for="f_ivrequired" style="margin:0;">면접이 있습니다</label></div>
+    <div class="row3">
+      <div class="field"><label>면접 날짜</label><input type="date" id="f_ivdate" value="${a.interviewDate||''}"></div>
+      <div class="field"><label>면접 시간</label><input type="time" id="f_ivtime" value="${a.interviewTime||''}"></div>
+      <div class="field"><label>최종 발표일</label><input type="date" id="f_announce" value="${a.announceDate||''}"></div>
+    </div>
+
+    <div class="field">
+      <label>면접 유형</label>
+      <div class="chip-toggle-group" id="ivTypeGroup">
+        <div class="chip-toggle" data-v="제시문 기반">제시문 기반</div>
+        <div class="chip-toggle" data-v="생기부 기반">생기부 기반</div>
+        <div class="chip-toggle" data-v="특수(영어면접 등)">특수(영어면접 등)</div>
+      </div>
+    </div>
+
+    <div class="row3">
+      <div class="field checkline"><input type="checkbox" id="f_choi" ${a.suneungChoi?'checked':''}><label for="f_choi" style="margin:0;">수능 최저 있음</label></div>
+      <div class="field checkline"><input type="checkbox" id="f_rec" ${a.recommendation?'checked':''}><label for="f_rec" style="margin:0;">추천서 필요</label></div>
+      <div class="field checkline"><input type="checkbox" id="f_selfintro" ${a.selfIntroRequired?'checked':''}><label for="f_selfintro" style="margin:0;">자기소개서 필요</label></div>
+    </div>
+    <div class="field"><label>수능 최저 기준 (해당 시)</label><input type="text" id="f_choitext" placeholder="예: 국,수,영,탐 중 2개 합 5 이내" value="${escapeHtml(a.suneungChoiText)}"></div>
+
+    <div class="field">
+      <label>자소서 문항</label>
+      <div id="qList"></div>
+      <button class="btn" id="addQBtn" type="button">+ 문항 추가</button>
+    </div>
+
+    <div class="field"><label>작년 입시결과 / 수시컷 참고 (선택)</label><input type="text" id="f_cutoff" placeholder="예: 작년 최종등록 평균 2.3등급, 경쟁률 8:1" value="${escapeHtml(a.cutoffNote)}"></div>
+
+    <div class="field">
+      <label>합격 가능성 (내 판단)</label>
+      <div class="prob-select">
+        <div class="prob-opt sel-상" data-v="상">상</div>
+        <div class="prob-opt sel-중" data-v="중">중</div>
+        <div class="prob-opt sel-하" data-v="하">하</div>
+        <div class="prob-opt sel-미정" data-v="미정">미정</div>
+      </div>
+    </div>
+
+    <div class="field"><label>메모</label><textarea id="f_memo" placeholder="전략 메모, 준비할 것, 특이사항 등">${escapeHtml(a.memo)}</textarea></div>
+
+    <div class="modal-actions">
+      <div class="left">${!isNew ? '<button class="btn danger-text" id="eDeleteBtn">삭제</button>' : ''}</div>
+      <div class="left"><button class="btn" id="eCancelBtn">취소</button><button class="btn primary" id="eSaveBtn">저장</button></div>
+    </div>
+  `;
+
   document.querySelectorAll('#ivTypeGroup .chip-toggle').forEach(chip=>{
     chip.classList.toggle('active', tempIvTypes.includes(chip.dataset.v));
+    chip.addEventListener('click', ()=>{
+      const v = chip.dataset.v; const i = tempIvTypes.indexOf(v);
+      if(i>=0) tempIvTypes.splice(i,1); else tempIvTypes.push(v);
+      chip.classList.toggle('active');
+    });
   });
   document.querySelectorAll('.prob-opt').forEach(opt=>{
     opt.classList.toggle('selected', opt.dataset.v === tempProb);
+    opt.addEventListener('click', ()=>{
+      tempProb = opt.dataset.v;
+      document.querySelectorAll('.prob-opt').forEach(o=> o.classList.toggle('selected', o===opt));
+    });
   });
-
   renderQList();
+  document.getElementById('addQBtn').addEventListener('click', ()=>{ tempQuestions.push(''); renderQList(); });
+  document.getElementById('eCancelBtn').addEventListener('click', ()=>{
+    if(isNew) closeModal(); else { modalMode='view'; renderViewMode(); }
+  });
+  if(!isNew) document.getElementById('eDeleteBtn').addEventListener('click', ()=>{
+    if(!confirm('이 항목을 삭제할까요?')) return;
+    delete state.admissions[editingId]; persist(); closeModal(); renderAll();
+  });
+  document.getElementById('eSaveBtn').addEventListener('click', ()=>{
+    const university = document.getElementById('f_uni').value.trim();
+    const admissionType = document.getElementById('f_type').value.trim();
+    const department = document.getElementById('f_dept').value.trim();
+    if(!university || !admissionType || !department){ alert('대학교, 전형 이름, 지원 학과는 필수입니다.'); return; }
+    const id = editingId || uid('adm');
+    state.admissions[id] = {
+      id, university, admissionType, department,
+      isCardSchool: document.getElementById('f_iscard').checked,
+      round1Ratio: document.getElementById('f_round1').value.trim(),
+      interviewRatio: document.getElementById('f_ivratio').value.trim(),
+      interviewRequired: document.getElementById('f_ivrequired').checked,
+      interviewDate: document.getElementById('f_ivdate').value,
+      interviewTime: document.getElementById('f_ivtime').value,
+      announceDate: document.getElementById('f_announce').value,
+      interviewTypes: tempIvTypes,
+      suneungChoi: document.getElementById('f_choi').checked,
+      suneungChoiText: document.getElementById('f_choitext').value.trim(),
+      recommendation: document.getElementById('f_rec').checked,
+      selfIntroRequired: document.getElementById('f_selfintro').checked,
+      selfIntroQuestions: tempQuestions.filter(q=>q.trim()),
+      cutoffNote: document.getElementById('f_cutoff').value.trim(),
+      probability: tempProb,
+      memo: document.getElementById('f_memo').value.trim(),
+    };
+    persist();
+    editingId = id; modalMode='view';
+    renderViewMode();
+    renderAll();
+  });
 }
-function closeModal(){ document.getElementById('modalBackdrop').classList.remove('open'); editingId=null; }
-document.getElementById('cancelBtn').addEventListener('click', closeModal);
-document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='modalBackdrop') closeModal(); });
-
-document.querySelectorAll('#ivTypeGroup .chip-toggle').forEach(chip=>{
-  chip.addEventListener('click', ()=>{
-    const v = chip.dataset.v; const i = tempIvTypes.indexOf(v);
-    if(i>=0) tempIvTypes.splice(i,1); else tempIvTypes.push(v);
-    chip.classList.toggle('active');
-  });
-});
-document.querySelectorAll('.prob-opt').forEach(opt=>{
-  opt.addEventListener('click', ()=>{
-    tempProb = opt.dataset.v;
-    document.querySelectorAll('.prob-opt').forEach(o=> o.classList.toggle('selected', o===opt));
-  });
-});
 
 function renderQList(){
-  const list = document.getElementById('qList'); list.innerHTML='';
+  const list = document.getElementById('qList'); if(!list) return; list.innerHTML='';
   tempQuestions.forEach((q, idx)=>{
     const row = document.createElement('div'); row.className='q-item';
     const ta = document.createElement('textarea'); ta.value = q; ta.placeholder = `문항 ${idx+1}`;
@@ -575,48 +662,15 @@ function renderQList(){
     row.appendChild(ta); row.appendChild(x); list.appendChild(row);
   });
 }
-document.getElementById('addQBtn').addEventListener('click', ()=>{ tempQuestions.push(''); renderQList(); });
 
-document.getElementById('saveAdmBtn').addEventListener('click', ()=>{
-  const university = document.getElementById('f_uni').value.trim();
-  const admissionType = document.getElementById('f_type').value.trim();
-  const department = document.getElementById('f_dept').value.trim();
-  if(!university || !admissionType || !department){ alert('대학교, 전형 이름, 지원 학과는 필수입니다.'); return; }
-
-  const id = editingId || uid('adm');
-  state.admissions[id] = {
-    id, university, admissionType, department,
-    isCardSchool: document.getElementById('f_iscard').checked,
-    round1Ratio: document.getElementById('f_round1').value.trim(),
-    interviewRatio: document.getElementById('f_ivratio').value.trim(),
-    interviewRequired: document.getElementById('f_ivrequired').checked,
-    interviewDate: document.getElementById('f_ivdate').value,
-    interviewTime: document.getElementById('f_ivtime').value,
-    announceDate: document.getElementById('f_announce').value,
-    interviewTypes: tempIvTypes,
-    suneungChoi: document.getElementById('f_choi').checked,
-    suneungChoiText: document.getElementById('f_choitext').value.trim(),
-    recommendation: document.getElementById('f_rec').checked,
-    selfIntroRequired: document.getElementById('f_selfintro').checked,
-    selfIntroQuestions: tempQuestions.filter(q=>q.trim()),
-    cutoffNote: document.getElementById('f_cutoff').value.trim(),
-    probability: tempProb,
-    memo: document.getElementById('f_memo').value.trim(),
-  };
-  persist(); closeModal(); renderAll();
-});
-document.getElementById('deleteAdmBtn').addEventListener('click', ()=>{
-  if(!editingId) return; if(!confirm('이 항목을 삭제할까요?')) return;
-  delete state.admissions[editingId]; persist(); closeModal(); renderAll();
-});
-document.getElementById('addAdmBtn').addEventListener('click', ()=> openModal(null));
-
-/* ---------- import/export ---------- */
+/* ---------- import/export/menu ---------- */
 document.getElementById('exportBtn').addEventListener('click', ()=>{
   const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
   a.href = url; a.download = `대입_전형_정리표_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
+  menuDropdown.classList.remove('open');
 });
+document.getElementById('importTrigger').addEventListener('click', ()=> document.getElementById('importInput').click());
 document.getElementById('importInput').addEventListener('change', (e)=>{
   const file = e.target.files[0]; if(!file) return;
   const reader = new FileReader();
@@ -627,15 +681,15 @@ document.getElementById('importInput').addEventListener('change', (e)=>{
       if(confirm('현재 데이터를 덮어쓰고 불러올까요?')){ state = data; persist(); renderAll(); }
     }catch(err){ alert('파일을 읽는 중 오류가 발생했습니다.'); }
   };
-  reader.readAsText(file); e.target.value='';
+  reader.readAsText(file); e.target.value=''; menuDropdown.classList.remove('open');
 });
 document.getElementById('clearBtn').addEventListener('click', ()=>{
   if(confirm('정말 모든 데이터를 삭제할까요? 이 작업은 되돌릴 수 없습니다.')){ state = {admissions:{}, lastSaved:null}; persist(); renderAll(); }
+  menuDropdown.classList.remove('open');
 });
 
-/* ---------- sample data ---------- */
 function loadSample(){
-  if(Object.keys(state.admissions).length > 0 && !confirm('현재 데이터가 있습니다. 예시 데이터로 덮어쓸까요?')) return;
+  if(Object.keys(state.admissions).length > 0 && !confirm('현재 데이터가 있습니다. 예시 데이터로 덮어쓸까요?')) { menuDropdown.classList.remove('open'); return; }
   state.admissions = {};
   const items = [
     {university:'한국대학교', admissionType:'학생부종합(미래인재)', department:'경영학과', isCardSchool:true,
@@ -660,11 +714,9 @@ function loadSample(){
      cutoffNote:'특기자 전형 성격, 6장 카드 외 별도 지원', probability:'미정', memo:'영어 면접 준비 필요 - 스크립트 연습'},
   ];
   items.forEach(it=>{ const id = uid('adm'); state.admissions[id] = {id, ...it}; });
-  persist(); renderAll();
+  persist(); renderAll(); menuDropdown.classList.remove('open');
 }
-function nextDate(daysFromNow){
-  const d = new Date(); d.setDate(d.getDate()+daysFromNow); return d.toISOString().slice(0,10);
-}
+function nextDate(daysFromNow){ const d = new Date(); d.setDate(d.getDate()+daysFromNow); return d.toISOString().slice(0,10); }
 document.getElementById('loadSampleBtn').addEventListener('click', loadSample);
 
 renderAll();
