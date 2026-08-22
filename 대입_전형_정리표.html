@@ -14,17 +14,8 @@
     --radius:10px; --shadow-sm:0 1px 2px rgba(0,0,0,0.04); --shadow-md:0 4px 14px rgba(0,0,0,0.08);
     font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   }
-  /* 다크모드: index.html과 동일한 변수 세트. 색을 바꾸려면 여기만 수정하면 됩니다. */
-  html[data-theme="dark"]{
-    --bg:#17181a; --bg-soft:#1f2023; --border:#302f32; --border-soft:#26262a;
-    --text:#f0efec; --text-soft:#b4b1ac; --text-faint:#7d7a75;
-    --accent:#e2896a; --accent-soft:#332420; --accent-deep:#f0a184;
-  }
-  html[data-theme="dark"] .board, html[data-theme="dark"] .modal, html[data-theme="dark"] .google-btn,
-  html[data-theme="dark"] .btn, html[data-theme="dark"] header, html[data-theme="dark"] .entry-card,
-  html[data-theme="dark"] .menu-dropdown{ background:var(--bg); color:var(--text); }
   *{box-sizing:border-box;}
-  body{ margin:0; background:var(--bg-soft); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; transition:background .2s, color .2s; }
+  body{ margin:0; background:var(--bg-soft); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
 
   header{ background:var(--bg); border-bottom:1px solid var(--border); padding:16px 28px; position:sticky; top:0; z-index:30; }
   .headrow{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
@@ -200,8 +191,6 @@
           <input type="file" id="importInput" class="menu-hidden-input" accept="application/json">
           <div class="menu-sep"></div>
           <button class="menu-item" id="goLedgerBtn">📖 생기부 이력표로 이동</button>
-          <button class="menu-item" id="goMainBtn">🏠 메인 사이트로</button>
-          <button class="menu-item" id="themeToggleBtn">🌓 다크모드 전환</button>
           <div class="menu-sep"></div>
           <button class="menu-item danger" id="clearBtn">🗑 전체 초기화</button>
         </div>
@@ -346,19 +335,6 @@ function showIndicator(msg, isError){
 /* ---------- menu ---------- */
 const menuBtn = document.getElementById('menuBtn'), menuDropdown = document.getElementById('menuDropdown');
 menuBtn.addEventListener('click', (e)=>{ e.stopPropagation(); menuDropdown.classList.toggle('open'); });
-
-/* 메인 사이트로 이동 + 다크모드 (index.html과 localStorage 'site_theme' 공유) */
-document.getElementById('goMainBtn').addEventListener('click', ()=>{ location.href = './index.html'; });
-document.getElementById('themeToggleBtn').addEventListener('click', ()=>{
-  const html = document.documentElement;
-  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('site_theme', next);
-});
-(function initTheme(){
-  const saved = localStorage.getItem('site_theme');
-  if(saved) document.documentElement.setAttribute('data-theme', saved);
-})();
 document.addEventListener('click', ()=> menuDropdown.classList.remove('open'));
 menuDropdown.addEventListener('click', (e)=> e.stopPropagation());
 
@@ -413,6 +389,7 @@ function renderList(){
       let meta = [];
       if(a.round1Ratio) meta.push('1차 '+a.round1Ratio);
       if(a.interviewRequired) meta.push('면접 '+(a.interviewRatio||'배수 미정'));
+      if(a.interviewWeight) meta.push('반영비율 '+a.interviewWeight);
       if(a.interviewDate) meta.push('면접일 '+a.interviewDate);
       if(a.announceDate) meta.push('발표 '+a.announceDate);
       if(a.suneungChoi) meta.push('수능최저 O');
@@ -506,6 +483,7 @@ function renderViewMode(){
       <div class="view-item"><div class="label">면접 여부</div><div class="val">${a.interviewRequired ? '있음' : '없음'}</div></div>
       <div class="view-item"><div class="label">면접 일시</div><div class="val">${a.interviewDate ? (a.interviewDate + ' ' + (a.interviewTime||'')) : '-'}</div></div>
       <div class="view-item"><div class="label">면접 유형</div><div class="val">${escapeHtml(ivTypes)}</div></div>
+      <div class="view-item"><div class="label">면접 반영 비율</div><div class="val">${escapeHtml(a.interviewWeight)||'-'}</div></div>
       <div class="view-item"><div class="label">최종 발표일</div><div class="val">${a.announceDate || '-'}</div></div>
       <div class="view-item"><div class="label">수능 최저</div><div class="val">${a.suneungChoi ? (escapeHtml(a.suneungChoiText)||'있음') : '없음'}</div></div>
       <div class="view-item"><div class="label">추천서</div><div class="val">${a.recommendation ? '필요' : '불필요'}</div></div>
@@ -543,7 +521,7 @@ function renderEditMode(){
   const isNew = !editingId;
   let a;
   if(!isNew){ a = state.admissions[editingId]; }
-  else{ a = { university:'', admissionType:'', department:'', isCardSchool:true, round1Ratio:'', interviewRatio:'',
+  else{ a = { university:'', admissionType:'', department:'', isCardSchool:true, round1Ratio:'', interviewRatio:'', interviewWeight:'',
     interviewRequired:false, interviewDate:'', interviewTime:'', announceDate:'', interviewTypes:[],
     suneungChoi:false, suneungChoiText:'', recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
     cutoffNote:'', probability:'미정', memo:'' }; }
@@ -571,6 +549,7 @@ function renderEditMode(){
     </div>
 
     <div class="field checkline"><input type="checkbox" id="f_ivrequired" ${a.interviewRequired?'checked':''}><label for="f_ivrequired" style="margin:0;">면접이 있습니다</label></div>
+    <div class="field"><label>면접 반영 비율 (전형 총점 중 면접이 차지하는 비중)</label><input type="text" id="f_ivweight" placeholder="예: 서류 70% + 면접 30%, 또는 면접 20점 만점" value="${escapeHtml(a.interviewWeight)}"></div>
     <div class="row3">
       <div class="field"><label>면접 날짜</label><input type="date" id="f_ivdate" value="${a.interviewDate||''}"></div>
       <div class="field"><label>면접 시간</label><input type="time" id="f_ivtime" value="${a.interviewTime||''}"></div>
@@ -654,6 +633,7 @@ function renderEditMode(){
       isCardSchool: document.getElementById('f_iscard').checked,
       round1Ratio: document.getElementById('f_round1').value.trim(),
       interviewRatio: document.getElementById('f_ivratio').value.trim(),
+      interviewWeight: document.getElementById('f_ivweight').value.trim(),
       interviewRequired: document.getElementById('f_ivrequired').checked,
       interviewDate: document.getElementById('f_ivdate').value,
       interviewTime: document.getElementById('f_ivtime').value,
