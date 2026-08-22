@@ -503,6 +503,8 @@ function renderViewMode(){
     <div class="view-grid">
       <div class="view-item"><div class="label">1차 서류 배수</div><div class="val">${escapeHtml(a.round1Ratio)||'-'}</div></div>
       <div class="view-item"><div class="label">면접 응시 배수</div><div class="val">${escapeHtml(a.interviewRatio)||'-'}</div></div>
+      <div class="view-item"><div class="label">서류 반영 비율</div><div class="val">${escapeHtml(a.documentWeight)||'-'}</div></div>
+      <div class="view-item"><div class="label">면접 반영 비율</div><div class="val">${escapeHtml(a.interviewWeight)||'-'}</div></div>
       <div class="view-item"><div class="label">면접 여부</div><div class="val">${a.interviewRequired ? '있음' : '없음'}</div></div>
       <div class="view-item"><div class="label">면접 일시</div><div class="val">${a.interviewDate ? (a.interviewDate + ' ' + (a.interviewTime||'')) : '-'}</div></div>
       <div class="view-item"><div class="label">면접 유형</div><div class="val">${escapeHtml(ivTypes)}</div></div>
@@ -544,6 +546,7 @@ function renderEditMode(){
   let a;
   if(!isNew){ a = state.admissions[editingId]; }
   else{ a = { university:'', admissionType:'', department:'', isCardSchool:true, round1Ratio:'', interviewRatio:'',
+    documentWeight:'', interviewWeight:'',
     interviewRequired:false, interviewDate:'', interviewTime:'', announceDate:'', interviewTypes:[],
     suneungChoi:false, suneungChoiText:'', recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
     cutoffNote:'', probability:'미정', memo:'' }; }
@@ -568,6 +571,10 @@ function renderEditMode(){
     <div class="row2">
       <div class="field"><label>1차 서류 합격 배수</label><input type="text" id="f_round1" placeholder="예: 3배수" value="${escapeHtml(a.round1Ratio)}"></div>
       <div class="field"><label>면접 응시 배수</label><input type="text" id="f_ivratio" placeholder="예: 3배수" value="${escapeHtml(a.interviewRatio)}"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>서류 반영 비율</label><input type="text" id="f_docweight" placeholder="예: 70%" value="${escapeHtml(a.documentWeight)}"></div>
+      <div class="field"><label>면접 반영 비율</label><input type="text" id="f_ivweight" placeholder="예: 30%" value="${escapeHtml(a.interviewWeight)}"></div>
     </div>
 
     <div class="field checkline"><input type="checkbox" id="f_ivrequired" ${a.interviewRequired?'checked':''}><label for="f_ivrequired" style="margin:0;">면접이 있습니다</label></div>
@@ -654,6 +661,8 @@ function renderEditMode(){
       isCardSchool: document.getElementById('f_iscard').checked,
       round1Ratio: document.getElementById('f_round1').value.trim(),
       interviewRatio: document.getElementById('f_ivratio').value.trim(),
+      documentWeight: document.getElementById('f_docweight').value.trim(),
+      interviewWeight: document.getElementById('f_ivweight').value.trim(),
       interviewRequired: document.getElementById('f_ivrequired').checked,
       interviewDate: document.getElementById('f_ivdate').value,
       interviewTime: document.getElementById('f_ivtime').value,
