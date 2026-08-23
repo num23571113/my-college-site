@@ -231,6 +231,19 @@
         <option value="uni">대학 이름순</option>
         <option value="date">면접/발표일 순</option>
       </select>
+      <span style="margin-left:6px;">필터</span>
+      <select id="filterCard">
+        <option value="all">6장 카드 전체</option>
+        <option value="card">6장 카드 포함만</option>
+        <option value="noncard">6장 카드 제외(추가지원)만</option>
+      </select>
+      <div class="chip-toggle-group" id="filterChips">
+        <div class="chip-toggle" data-filter="recommendation">추천서 필요</div>
+        <div class="chip-toggle" data-filter="selfIntro">자소서 필요</div>
+        <div class="chip-toggle" data-filter="interview">면접 있음</div>
+        <div class="chip-toggle" data-filter="choi">수능최저 있음</div>
+      </div>
+      <button class="btn subtle" id="filterResetBtn" style="padding:5px 10px;">필터 초기화</button>
       <span>· 카드를 클릭하면 상세 정보를 볼 수 있습니다</span>
     </div>
     <div id="listContainer"></div>
@@ -375,15 +388,46 @@ document.getElementById('goLedgerBtn').addEventListener('click', ()=> window.ope
 
 /* ---------- list ---------- */
 const PROB_ORDER = {'상':0,'중':1,'하':2,'미정':3};
+let activeFilters = { recommendation:false, selfIntro:false, interview:false, choi:false, card:'all' };
 function renderAll(){ renderList(); updateTimestamp(); if(currentView==='cal') renderCalendar(); }
 document.getElementById('sortSelect').addEventListener('change', renderList);
+document.getElementById('filterCard').addEventListener('change', (e)=>{ activeFilters.card = e.target.value; renderList(); });
+document.querySelectorAll('#filterChips .chip-toggle').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    const key = chip.dataset.filter;
+    activeFilters[key] = !activeFilters[key];
+    chip.classList.toggle('active', activeFilters[key]);
+    renderList();
+  });
+});
+document.getElementById('filterResetBtn').addEventListener('click', ()=>{
+  activeFilters = { recommendation:false, selfIntro:false, interview:false, choi:false, card:'all' };
+  document.querySelectorAll('#filterChips .chip-toggle').forEach(c=> c.classList.remove('active'));
+  document.getElementById('filterCard').value = 'all';
+  renderList();
+});
+function applyFilters(list){
+  return list.filter(a=>{
+    if(activeFilters.recommendation && !a.recommendation) return false;
+    if(activeFilters.selfIntro && !a.selfIntroRequired) return false;
+    if(activeFilters.interview && !a.interviewRequired) return false;
+    if(activeFilters.choi && !a.suneungChoi) return false;
+    if(activeFilters.card === 'card' && a.isCardSchool === false) return false;
+    if(activeFilters.card === 'noncard' && a.isCardSchool !== false) return false;
+    return true;
+  });
+}
 
 function renderList(){
   const container = document.getElementById('listContainer');
   container.innerHTML = '';
-  const all = Object.values(state.admissions);
-  if(all.length === 0){
+  const all = applyFilters(Object.values(state.admissions));
+  if(Object.keys(state.admissions).length === 0){
     container.innerHTML = '<div class="empty-note">아직 등록된 대학/전형이 없습니다. "대학/전형 추가"를 누르거나 메뉴에서 예시 데이터를 불러와보세요.</div>';
+    return;
+  }
+  if(all.length === 0){
+    container.innerHTML = '<div class="empty-note">선택한 필터 조건에 맞는 대학/전형이 없습니다. "필터 초기화"를 눌러보세요.</div>';
     return;
   }
   const sortMode = document.getElementById('sortSelect').value;
