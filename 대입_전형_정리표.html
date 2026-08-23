@@ -103,11 +103,37 @@
   .cal-nav{ display:flex; gap:6px; }
   .cal-nav button{ color:var(--text); border:1px solid var(--border); background:#fff; width:32px; height:32px; border-radius:8px; }
   .cal-nav button:hover{ background:var(--bg-soft); }
-  .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; }
-  .cal-dow{ text-align:center; font-size:11px; color:var(--text-faint); font-weight:700; padding:4px 0; }
-  .cal-day{ min-height:88px; border:1px solid var(--border-soft); border-radius:8px; padding:6px; font-size:11px; background:#fff; position:relative; }
+  .cal-grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:0; border:1px solid var(--border-soft); border-radius:8px; overflow:hidden; }
+  .cal-dow{ text-align:center; font-size:11px; color:var(--text-faint); font-weight:700; padding:4px 0; border-bottom:1px solid var(--border-soft); background:var(--bg-soft); }
+  .cal-day{ min-height:92px; border-right:1px solid var(--border-soft); border-bottom:1px solid var(--border-soft); padding:6px 6px 8px; font-size:11px; background:#fff; position:relative; }
+  .cal-day:nth-child(7n){ border-right:none; }
   .cal-day.other-month{ background:var(--bg-soft); opacity:.55; }
   .cal-day .num{ font-weight:700; color:var(--text); font-size:12px; margin-bottom:4px; }
+  .period-bars{ display:flex; flex-direction:column; gap:2px; margin:0 -6px 4px; }
+  .period-bar{ height:7px; cursor:pointer; opacity:.85; }
+  .period-bar:hover{ opacity:1; }
+  .period-bar.is-start{ margin-left:6px; border-top-left-radius:5px; border-bottom-left-radius:5px; }
+  .period-bar.is-end{ margin-right:6px; border-top-right-radius:5px; border-bottom-right-radius:5px; }
+  .period-bar.is-start.is-end{ margin-left:6px; margin-right:6px; }
+
+  /* D-day 목록 */
+  .dday-list{ display:flex; flex-direction:column; gap:8px; }
+  .dday-item{ display:flex; align-items:center; gap:12px; background:#fff; border:1px solid var(--border); border-radius:10px; padding:12px 16px; box-shadow:var(--shadow-sm); cursor:pointer; transition:.12s; }
+  .dday-item:hover{ box-shadow:var(--shadow-md); border-color:#d8d8d8; }
+  .dday-item.past{ opacity:.5; }
+  .dday-colordot{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .dday-badge{ font-size:12px; font-weight:800; padding:5px 11px; border-radius:8px; min-width:56px; text-align:center; flex-shrink:0; }
+  .dday-badge.today{ background:var(--red); color:#fff; }
+  .dday-badge.soon{ background:var(--amber-bg); color:var(--amber); }
+  .dday-badge.later{ background:var(--gray-bg); color:var(--gray); }
+  .dday-badge.past{ background:var(--gray-bg); color:var(--text-faint); }
+  .dday-info{ flex:1; min-width:0; }
+  .dday-info .title{ font-size:13.5px; font-weight:700; color:var(--text); }
+  .dday-info .sub{ font-size:11.5px; color:var(--text-soft); margin-top:1px; }
+  .dday-date{ font-size:11.5px; color:var(--text-faint); flex-shrink:0; }
+  .color-swatches{ display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+  .color-swatch{ width:26px; height:26px; border-radius:7px; cursor:pointer; border:2px solid transparent; }
+  .color-swatch.selected{ border-color:var(--text); }
   .cal-event{ font-size:10px; padding:3px 6px; border-radius:5px; margin-bottom:3px; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .cal-event.prob-상{ background:var(--green-bg); color:var(--green); }
   .cal-event.prob-중{ background:var(--amber-bg); color:var(--amber); }
@@ -210,9 +236,11 @@
   <div class="subheadrow">
     <div class="toolbar-left">
       <button class="btn primary" id="addAdmBtn">＋ 대학/전형 추가</button>
+      <button class="btn" id="addEventBtn">📌 내 일정 추가</button>
       <div class="tabs">
         <button id="tabList" class="active-tab">목록 보기</button>
         <button id="tabCal">캘린더 보기</button>
+        <button id="tabDday">D-day 목록</button>
       </div>
     </div>
     <div class="savebar">
@@ -259,6 +287,10 @@
       <div class="cal-grid" id="calGrid"></div>
     </div>
   </div>
+
+  <div id="ddayView" style="display:none;">
+    <div id="ddayContainer"></div>
+  </div>
 </div>
 
 <footer>Google 계정으로 로그인하면 클라우드에 자동 저장됩니다. "생기부 이력표"와 같은 계정으로 로그인하면 로그인 정보를 공유합니다 (데이터는 사이트별로 분리 저장).</footer>
@@ -275,9 +307,12 @@
 <script src="./firebase-config.js"></script>
 <script>
 const STORAGE_KEY = 'admissions_board_v1';
-let state = loadLocal() || { admissions: {}, lastSaved: null };
+let state = loadLocal() || { admissions: {}, customEvents: {}, lastSaved: null };
+if(!state.customEvents) state.customEvents = {};
 let editingId = null, modalMode = 'view';
-let tempIvTypes = [], tempQuestions = [], tempProb = '미정';
+let editingEventId = null, isNewEvent = false;
+let tempIvTypes = [], tempQuestions = [], tempProb = '미정', tempPeriodColor = '#d97757';
+let tempEventColor = '#3aa76d';
 let currentView = 'list';
 let calYear, calMonth;
 
@@ -325,7 +360,7 @@ async function loadFromCloud(){
     const doc = await fbDb.collection('users').doc(currentUser.uid).collection('admissions').doc('main').get();
     if(doc.exists){
       const data = doc.data();
-      state = { admissions: data.admissions||{}, lastSaved: data.lastSaved||null };
+      state = { admissions: data.admissions||{}, customEvents: data.customEvents||{}, lastSaved: data.lastSaved||null };
       saveLocal();
     }else{ await saveToCloud(); }
   }catch(e){ console.error(e); showIndicator('클라우드 불러오기 실패', true); }
@@ -335,7 +370,7 @@ async function saveToCloud(){
   if(!cloudReady || !currentUser) return;
   try{
     await fbDb.collection('users').doc(currentUser.uid).collection('admissions').doc('main')
-      .set({ admissions: state.admissions, lastSaved: new Date().toISOString() });
+      .set({ admissions: state.admissions, customEvents: state.customEvents||{}, lastSaved: new Date().toISOString() });
   }catch(e){ console.error(e); showIndicator('클라우드 저장 실패 (로컬에는 저장됨)', true); }
 }
 function saveLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -375,21 +410,37 @@ document.addEventListener('click', ()=> menuDropdown.classList.remove('open'));
 menuDropdown.addEventListener('click', (e)=> e.stopPropagation());
 
 /* ---------- tabs ---------- */
+function hideAllViews(){
+  document.getElementById('listView').style.display='none';
+  document.getElementById('calView').style.display='none';
+  document.getElementById('ddayView').style.display='none';
+  document.getElementById('tabList').classList.remove('active-tab');
+  document.getElementById('tabCal').classList.remove('active-tab');
+  document.getElementById('tabDday').classList.remove('active-tab');
+}
 document.getElementById('tabList').addEventListener('click', ()=>{
-  currentView='list'; document.getElementById('listView').style.display='block'; document.getElementById('calView').style.display='none';
-  document.getElementById('tabList').classList.add('active-tab'); document.getElementById('tabCal').classList.remove('active-tab');
+  currentView='list'; hideAllViews();
+  document.getElementById('listView').style.display='block';
+  document.getElementById('tabList').classList.add('active-tab');
 });
 document.getElementById('tabCal').addEventListener('click', ()=>{
-  currentView='cal'; document.getElementById('listView').style.display='none'; document.getElementById('calView').style.display='block';
-  document.getElementById('tabCal').classList.add('active-tab'); document.getElementById('tabList').classList.remove('active-tab');
+  currentView='cal'; hideAllViews();
+  document.getElementById('calView').style.display='block';
+  document.getElementById('tabCal').classList.add('active-tab');
   renderCalendar();
+});
+document.getElementById('tabDday').addEventListener('click', ()=>{
+  currentView='dday'; hideAllViews();
+  document.getElementById('ddayView').style.display='block';
+  document.getElementById('tabDday').classList.add('active-tab');
+  renderDday();
 });
 document.getElementById('goLedgerBtn').addEventListener('click', ()=> window.open('./생기부_정리표.html','_blank'));
 
 /* ---------- list ---------- */
 const PROB_ORDER = {'상':0,'중':1,'하':2,'미정':3};
 let activeFilters = { recommendation:false, selfIntro:false, interview:false, choi:false, card:'all' };
-function renderAll(){ renderList(); updateTimestamp(); if(currentView==='cal') renderCalendar(); }
+function renderAll(){ renderList(); updateTimestamp(); if(currentView==='cal') renderCalendar(); if(currentView==='dday') renderDday(); }
 document.getElementById('sortSelect').addEventListener('change', renderList);
 document.getElementById('filterCard').addEventListener('change', (e)=>{ activeFilters.card = e.target.value; renderList(); });
 document.querySelectorAll('#filterChips .chip-toggle').forEach(chip=>{
@@ -494,18 +545,26 @@ function renderCalendar(){
   const startWeekday = firstDay.getDay();
   const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
   const daysInPrevMonth = new Date(calYear, calMonth, 0).getDate();
+
   const events = {};
   function addEvent(dateStr, label, prob, id){
     if(!dateStr) return;
     (events[dateStr] = events[dateStr]||[]).push({label, prob:prob||'미정', id});
   }
   Object.values(state.admissions).forEach(a=>{
-    addEvent(a.applicationStart, `📝 ${a.university} 원서접수 시작`, a.probability, a.id);
-    addEvent(a.applicationEnd, `📝 ${a.university} 원서접수 마감`, a.probability, a.id);
     addEvent(a.round1AnnounceDate, `📄 ${a.university} 서류(1차) 발표`, a.probability, a.id);
     if(a.interviewRequired){ addEvent(a.interviewDate, `🎤 ${a.university} 면접`, a.probability, a.id); }
     addEvent(a.announceDate, `📢 ${a.university} 최종 발표`, a.probability, a.id);
   });
+  Object.values(state.customEvents||{}).forEach(ev=>{
+    (events[ev.date] = events[ev.date]||[]).push({label: `📌 ${ev.title}`, prob:null, id: ev.id, isCustom:true, color: ev.color});
+  });
+
+  // 원서접수 기간(시작일~종료일)을 이어지는 색상 바로 표시하기 위한 목록
+  const periods = Object.values(state.admissions)
+    .filter(a=> a.applicationStart && a.applicationEnd)
+    .map(a=> ({ id:a.id, university:a.university, start:a.applicationStart, end:a.applicationEnd, color:a.periodColor||'#d97757' }));
+
   const totalCells = Math.ceil((startWeekday + daysInMonth) / 7) * 7;
   for(let i=0;i<totalCells;i++){
     const dayNum = i - startWeekday + 1;
@@ -516,11 +575,28 @@ function renderCalendar(){
     else{ realDate = new Date(calYear, calMonth, dayNum); }
     const dateStr = realDate.toISOString().slice(0,10);
     cell.innerHTML = `<div class="num">${realDate.getDate()}</div>`;
+
+    // 기간 바 (해당 날짜가 포함된 원서접수 기간들)
+    const activePeriods = periods.filter(p=> dateStr>=p.start && dateStr<=p.end);
+    if(activePeriods.length){
+      const barsWrap = document.createElement('div'); barsWrap.className='period-bars';
+      activePeriods.forEach(p=>{
+        const bar = document.createElement('div');
+        bar.className = 'period-bar' + (dateStr===p.start?' is-start':'') + (dateStr===p.end?' is-end':'');
+        bar.style.background = p.color;
+        bar.title = `${p.university} 원서접수 (${p.start} ~ ${p.end})`;
+        bar.addEventListener('click', ()=> openModal(p.id, 'view'));
+        barsWrap.appendChild(bar);
+      });
+      cell.appendChild(barsWrap);
+    }
+
     (events[dateStr]||[]).forEach(ev=>{
       const evEl = document.createElement('div');
-      evEl.className = `cal-event prob-${ev.prob}`;
+      evEl.className = ev.isCustom ? 'cal-event' : `cal-event prob-${ev.prob}`;
+      if(ev.isCustom){ evEl.style.background = (ev.color||'#3aa76d')+'22'; evEl.style.color = ev.color||'#3aa76d'; evEl.style.borderLeft = `3px solid ${ev.color||'#3aa76d'}`; }
       evEl.textContent = ev.label; evEl.title = ev.label;
-      evEl.addEventListener('click', ()=> openModal(ev.id, 'view'));
+      evEl.addEventListener('click', ()=> ev.isCustom ? openEventModal(ev.id) : openModal(ev.id, 'view'));
       cell.appendChild(evEl);
     });
     grid.appendChild(cell);
@@ -528,6 +604,54 @@ function renderCalendar(){
 }
 document.getElementById('calPrev').addEventListener('click', ()=>{ calMonth--; if(calMonth<0){calMonth=11; calYear--;} renderCalendar(); });
 document.getElementById('calNext').addEventListener('click', ()=>{ calMonth++; if(calMonth>11){calMonth=0; calYear++;} renderCalendar(); });
+
+/* ---------- D-day 목록 ---------- */
+function daysUntil(dateStr){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(dateStr+'T00:00:00');
+  return Math.round((target-today)/86400000);
+}
+function collectAllEvents(){
+  const list = [];
+  Object.values(state.admissions).forEach(a=>{
+    if(a.applicationStart) list.push({date:a.applicationStart, title:`${a.university} 원서접수 시작`, sub:a.admissionType, color:a.periodColor||'#d97757', kind:'admission', id:a.id});
+    if(a.applicationEnd) list.push({date:a.applicationEnd, title:`${a.university} 원서접수 마감`, sub:a.admissionType, color:a.periodColor||'#d97757', kind:'admission', id:a.id});
+    if(a.round1AnnounceDate) list.push({date:a.round1AnnounceDate, title:`${a.university} 서류(1차) 발표`, sub:a.admissionType, color:'#233350', kind:'admission', id:a.id});
+    if(a.interviewRequired && a.interviewDate) list.push({date:a.interviewDate, title:`${a.university} 면접`, sub:(a.interviewTime? a.interviewTime+' · ':'')+a.admissionType, color:'#9b2c2c', kind:'admission', id:a.id});
+    if(a.announceDate) list.push({date:a.announceDate, title:`${a.university} 최종 발표`, sub:a.admissionType, color:'#b8860b', kind:'admission', id:a.id});
+  });
+  Object.values(state.customEvents||{}).forEach(ev=>{
+    list.push({date:ev.date, title:ev.title, sub:ev.memo||'내 일정', color:ev.color||'#3aa76d', kind:'custom', id:ev.id});
+  });
+  return list.filter(e=>e.date).sort((a,b)=> a.date.localeCompare(b.date));
+}
+function renderDday(){
+  const container = document.getElementById('ddayContainer');
+  const all = collectAllEvents();
+  if(all.length===0){
+    container.innerHTML = '<div class="empty-note">표시할 일정이 없습니다. 대학/전형에 날짜를 입력하거나 "내 일정 추가"를 눌러보세요.</div>';
+    return;
+  }
+  const listEl = document.createElement('div'); listEl.className='dday-list';
+  all.forEach(ev=>{
+    const d = daysUntil(ev.date);
+    const item = document.createElement('div'); item.className='dday-item' + (d<0?' past':'');
+    let badgeClass = 'later', badgeText = `D-${d}`;
+    if(d===0){ badgeClass='today'; badgeText='D-DAY'; }
+    else if(d<0){ badgeClass='past'; badgeText=`D+${Math.abs(d)}`; }
+    else if(d<=7){ badgeClass='soon'; badgeText=`D-${d}`; }
+    item.innerHTML = `
+      <span class="dday-colordot" style="background:${ev.color}"></span>
+      <span class="dday-badge ${badgeClass}">${badgeText}</span>
+      <span class="dday-info"><div class="title">${escapeHtml(ev.title)}</div><div class="sub">${escapeHtml(ev.sub||'')}</div></span>
+      <span class="dday-date">${ev.date}</span>
+    `;
+    item.addEventListener('click', ()=> ev.kind==='custom' ? openEventModal(ev.id) : openModal(ev.id, 'view'));
+    listEl.appendChild(item);
+  });
+  container.innerHTML = '';
+  container.appendChild(listEl);
+}
 
 /* ---------- modal ---------- */
 function openModal(id, mode){
@@ -538,6 +662,66 @@ function openModal(id, mode){
 function closeModal(){ document.getElementById('modalBackdrop').classList.remove('open'); editingId=null; }
 document.getElementById('modalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='modalBackdrop') closeModal(); });
 document.getElementById('addAdmBtn').addEventListener('click', ()=> openModal(null, 'edit'));
+
+/* ---------- 내 일정(커스텀 이벤트) 모달 ---------- */
+function openEventModal(id){
+  editingEventId = id; isNewEvent = !id;
+  document.getElementById('modalBackdrop').classList.add('open');
+  renderEventModal();
+}
+document.getElementById('addEventBtn').addEventListener('click', ()=> openEventModal(null));
+
+function renderEventModal(){
+  const isNew = isNewEvent;
+  const ev = isNew ? {title:'', date:'', color:'#3aa76d', memo:''} : state.customEvents[editingEventId];
+  tempEventColor = ev.color || '#3aa76d';
+  const modal = document.getElementById('modalBody');
+  modal.innerHTML = `
+    <h2>${isNew ? '내 일정 추가' : '내 일정 편집'}</h2>
+    <div class="sub">원서접수, 상담, 공부 계획 등 자유롭게 추가하는 나만의 일정입니다. 캘린더와 D-day 목록에 함께 표시됩니다.</div>
+    <div class="field"><label>제목</label><input type="text" id="ev_title" placeholder="예: 학생부 최종 점검" value="${escapeHtml(ev.title)}"></div>
+    <div class="field"><label>날짜</label><input type="date" id="ev_date" value="${ev.date||''}"></div>
+    <div class="field">
+      <label>색상</label>
+      <div class="color-swatches" id="eventColorSwatches"></div>
+    </div>
+    <div class="field"><label>메모 (선택)</label><input type="text" id="ev_memo" placeholder="예: 담임 선생님과 상담" value="${escapeHtml(ev.memo)}"></div>
+    <div class="modal-actions">
+      <div class="left">${!isNew ? '<button class="btn danger-text" id="evDeleteBtn">삭제</button>' : ''}</div>
+      <div class="left"><button class="btn" id="evCancelBtn">취소</button><button class="btn primary" id="evSaveBtn">저장</button></div>
+    </div>
+  `;
+  const PALETTE = ['#3aa76d','#d97757','#2f6fed','#b8860b','#9b2c2c','#7a4fd6','#0e9ba0','#e0518b'];
+  const swWrap = document.getElementById('eventColorSwatches');
+  function renderSwatches(){
+    swWrap.innerHTML='';
+    PALETTE.forEach(c=>{
+      const sw = document.createElement('div'); sw.className='color-swatch' + (tempEventColor===c?' selected':'');
+      sw.style.background=c;
+      sw.addEventListener('click', ()=>{ tempEventColor=c; renderSwatches(); });
+      swWrap.appendChild(sw);
+    });
+    const custom = document.createElement('input'); custom.type='color'; custom.value=tempEventColor;
+    custom.style.width='26px'; custom.style.height='26px'; custom.style.border='none'; custom.style.borderRadius='7px'; custom.style.cursor='pointer'; custom.style.padding='0';
+    custom.addEventListener('input', (e)=>{ tempEventColor=e.target.value; renderSwatches(); });
+    swWrap.appendChild(custom);
+  }
+  renderSwatches();
+  document.getElementById('evCancelBtn').addEventListener('click', closeModal);
+  if(!isNew) document.getElementById('evDeleteBtn').addEventListener('click', ()=>{
+    if(!confirm('이 일정을 삭제할까요?')) return;
+    delete state.customEvents[editingEventId]; persist(); closeModal(); renderAll();
+  });
+  document.getElementById('evSaveBtn').addEventListener('click', ()=>{
+    const title = document.getElementById('ev_title').value.trim();
+    const date = document.getElementById('ev_date').value;
+    if(!title || !date){ alert('제목과 날짜는 필수입니다.'); return; }
+    const memo = document.getElementById('ev_memo').value.trim();
+    const id = editingEventId || uid('cev');
+    state.customEvents[id] = { id, title, date, color: tempEventColor, memo };
+    persist(); closeModal(); renderAll();
+  });
+}
 
 function renderViewMode(){
   const a = state.admissions[editingId];
@@ -608,6 +792,7 @@ function renderEditMode(){
   tempIvTypes = (a.interviewTypes||[]).slice();
   tempQuestions = (a.selfIntroQuestions||[]).slice();
   tempProb = a.probability || '미정';
+  tempPeriodColor = a.periodColor || '#d97757';
 
   const modal = document.getElementById('modalBody');
   modal.innerHTML = `
@@ -625,6 +810,11 @@ function renderEditMode(){
     <div class="row2">
       <div class="field"><label>원서 접수 시작일</label><input type="date" id="f_appstart" value="${a.applicationStart||''}"></div>
       <div class="field"><label>원서 접수 마감일</label><input type="date" id="f_append" value="${a.applicationEnd||''}"></div>
+    </div>
+    <div class="field">
+      <label>원서 접수 기간 캘린더 색상</label>
+      <div class="color-swatches" id="periodColorSwatches"></div>
+      <small class="hint">캘린더에서 원서접수 시작일~마감일이 선택한 색으로 이어져 표시됩니다.</small>
     </div>
 
     <div class="row3">
@@ -702,6 +892,22 @@ function renderEditMode(){
     });
   });
   renderQList();
+  const PALETTE = ['#d97757','#3aa76d','#2f6fed','#b8860b','#9b2c2c','#7a4fd6','#0e9ba0','#e0518b'];
+  const swWrap = document.getElementById('periodColorSwatches');
+  function renderSwatches(){
+    swWrap.innerHTML='';
+    PALETTE.forEach(c=>{
+      const sw = document.createElement('div'); sw.className='color-swatch' + (tempPeriodColor===c?' selected':'');
+      sw.style.background=c;
+      sw.addEventListener('click', ()=>{ tempPeriodColor=c; renderSwatches(); });
+      swWrap.appendChild(sw);
+    });
+    const custom = document.createElement('input'); custom.type='color'; custom.value=tempPeriodColor;
+    custom.style.width='26px'; custom.style.height='26px'; custom.style.border='none'; custom.style.borderRadius='7px'; custom.style.cursor='pointer'; custom.style.padding='0';
+    custom.addEventListener('input', (e)=>{ tempPeriodColor=e.target.value; renderSwatches(); });
+    swWrap.appendChild(custom);
+  }
+  renderSwatches();
   document.getElementById('addQBtn').addEventListener('click', ()=>{ tempQuestions.push(''); renderQList(); });
   document.getElementById('eCancelBtn').addEventListener('click', ()=>{
     if(isNew) closeModal(); else { modalMode='view'; renderViewMode(); }
@@ -721,6 +927,7 @@ function renderEditMode(){
       isCardSchool: document.getElementById('f_iscard').checked,
       applicationStart: document.getElementById('f_appstart').value,
       applicationEnd: document.getElementById('f_append').value,
+      periodColor: tempPeriodColor,
       round1AnnounceDate: document.getElementById('f_round1announce').value,
       round1Ratio: document.getElementById('f_round1').value.trim(),
       interviewRatio: document.getElementById('f_ivratio').value.trim(),
@@ -774,13 +981,13 @@ document.getElementById('importInput').addEventListener('change', (e)=>{
     try{
       const data = JSON.parse(reader.result);
       if(!data.admissions) throw new Error('형식 오류');
-      if(confirm('현재 데이터를 덮어쓰고 불러올까요?')){ state = data; persist(); renderAll(); }
+      if(confirm('현재 데이터를 덮어쓰고 불러올까요?')){ state = { admissions:data.admissions||{}, customEvents:data.customEvents||{}, lastSaved:data.lastSaved||null }; persist(); renderAll(); }
     }catch(err){ alert('파일을 읽는 중 오류가 발생했습니다.'); }
   };
   reader.readAsText(file); e.target.value=''; menuDropdown.classList.remove('open');
 });
 document.getElementById('clearBtn').addEventListener('click', ()=>{
-  if(confirm('정말 모든 데이터를 삭제할까요? 이 작업은 되돌릴 수 없습니다.')){ state = {admissions:{}, lastSaved:null}; persist(); renderAll(); }
+  if(confirm('정말 모든 데이터를 삭제할까요? 이 작업은 되돌릴 수 없습니다.')){ state = {admissions:{}, customEvents:{}, lastSaved:null}; persist(); renderAll(); }
   menuDropdown.classList.remove('open');
 });
 
