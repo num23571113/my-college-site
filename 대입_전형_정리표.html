@@ -14,7 +14,6 @@
     --radius:10px; --shadow-sm:0 1px 2px rgba(0,0,0,0.04); --shadow-md:0 4px 14px rgba(0,0,0,0.08);
     font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   }
-  /* 다크모드: index.html과 동일한 변수 세트. 색을 바꾸려면 여기만 수정하면 됩니다. */
   html[data-theme="dark"]{
     --bg:#17181a; --bg-soft:#1f2023; --border:#302f32; --border-soft:#26262a;
     --text:#f0efec; --text-soft:#b4b1ac; --text-faint:#7d7a75;
@@ -411,10 +410,14 @@ function renderList(){
       const card = document.createElement('div');
       card.className = 'adm-card prob-' + (a.probability||'미정');
       let meta = [];
+      if(a.applicationStart||a.applicationEnd) meta.push('원서접수 '+(a.applicationStart||'?')+'~'+(a.applicationEnd||'?'));
       if(a.round1Ratio) meta.push('1차 '+a.round1Ratio);
+      if(a.round1AnnounceDate) meta.push('서류발표 '+a.round1AnnounceDate);
       if(a.interviewRequired) meta.push('면접 '+(a.interviewRatio||'배수 미정'));
+      if(a.documentWeight) meta.push('서류비율 '+a.documentWeight);
+      if(a.interviewWeight) meta.push('면접비율 '+a.interviewWeight);
       if(a.interviewDate) meta.push('면접일 '+a.interviewDate);
-      if(a.announceDate) meta.push('발표 '+a.announceDate);
+      if(a.announceDate) meta.push('최종발표 '+a.announceDate);
       if(a.suneungChoi) meta.push('수능최저 O');
       if(a.recommendation) meta.push('추천서 O');
       if(a.selfIntroRequired) meta.push('자소서 O');
@@ -448,13 +451,16 @@ function renderCalendar(){
   const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
   const daysInPrevMonth = new Date(calYear, calMonth, 0).getDate();
   const events = {};
+  function addEvent(dateStr, label, prob, id){
+    if(!dateStr) return;
+    (events[dateStr] = events[dateStr]||[]).push({label, prob:prob||'미정', id});
+  }
   Object.values(state.admissions).forEach(a=>{
-    if(a.interviewRequired && a.interviewDate){
-      (events[a.interviewDate] = events[a.interviewDate]||[]).push({label:`🎤 ${a.university} 면접`, prob:a.probability||'미정', id:a.id});
-    }
-    if(a.announceDate){
-      (events[a.announceDate] = events[a.announceDate]||[]).push({label:`📢 ${a.university} 발표`, prob:a.probability||'미정', id:a.id});
-    }
+    addEvent(a.applicationStart, `📝 ${a.university} 원서접수 시작`, a.probability, a.id);
+    addEvent(a.applicationEnd, `📝 ${a.university} 원서접수 마감`, a.probability, a.id);
+    addEvent(a.round1AnnounceDate, `📄 ${a.university} 서류(1차) 발표`, a.probability, a.id);
+    if(a.interviewRequired){ addEvent(a.interviewDate, `🎤 ${a.university} 면접`, a.probability, a.id); }
+    addEvent(a.announceDate, `📢 ${a.university} 최종 발표`, a.probability, a.id);
   });
   const totalCells = Math.ceil((startWeekday + daysInMonth) / 7) * 7;
   for(let i=0;i<totalCells;i++){
@@ -494,6 +500,7 @@ function renderViewMode(){
   const modal = document.getElementById('modalBody');
   const ivTypes = (a.interviewTypes||[]).join(' · ') || '해당 없음';
   const questions = (a.selfIntroQuestions||[]);
+  const appPeriod = (a.applicationStart||a.applicationEnd) ? `${a.applicationStart||'?'} ~ ${a.applicationEnd||'?'}` : '-';
   modal.innerHTML = `
     <span class="view-badge badge prob-${a.probability||'미정'}">합격 가능성: ${a.probability||'미정'}</span>
     ${a.isCardSchool ? '<span class="view-badge" style="background:var(--accent-soft); color:var(--accent-deep); margin-left:6px;">6장 카드 포함</span>' : '<span class="view-badge" style="background:var(--gray-bg); color:var(--gray); margin-left:6px;">추가 지원</span>'}
@@ -501,6 +508,8 @@ function renderViewMode(){
     <div class="view-sub">${escapeHtml(a.admissionType)} · ${escapeHtml(a.department)}</div>
 
     <div class="view-grid">
+      <div class="view-item"><div class="label">원서 접수 기간</div><div class="val">${appPeriod}</div></div>
+      <div class="view-item"><div class="label">서류(1차) 전형 발표일</div><div class="val">${a.round1AnnounceDate || '-'}</div></div>
       <div class="view-item"><div class="label">1차 서류 배수</div><div class="val">${escapeHtml(a.round1Ratio)||'-'}</div></div>
       <div class="view-item"><div class="label">면접 응시 배수</div><div class="val">${escapeHtml(a.interviewRatio)||'-'}</div></div>
       <div class="view-item"><div class="label">서류 반영 비율</div><div class="val">${escapeHtml(a.documentWeight)||'-'}</div></div>
@@ -545,8 +554,9 @@ function renderEditMode(){
   const isNew = !editingId;
   let a;
   if(!isNew){ a = state.admissions[editingId]; }
-  else{ a = { university:'', admissionType:'', department:'', isCardSchool:true, round1Ratio:'', interviewRatio:'',
-    documentWeight:'', interviewWeight:'',
+  else{ a = { university:'', admissionType:'', department:'', isCardSchool:true,
+    applicationStart:'', applicationEnd:'', round1AnnounceDate:'',
+    round1Ratio:'', interviewRatio:'', documentWeight:'', interviewWeight:'',
     interviewRequired:false, interviewDate:'', interviewTime:'', announceDate:'', interviewTypes:[],
     suneungChoi:false, suneungChoiText:'', recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
     cutoffNote:'', probability:'미정', memo:'' }; }
@@ -569,7 +579,13 @@ function renderEditMode(){
     <div class="field checkline"><input type="checkbox" id="f_iscard" ${a.isCardSchool!==false?'checked':''}><label for="f_iscard" style="margin:0;">6장 지원 카드에 포함된 학교입니다</label></div>
 
     <div class="row2">
+      <div class="field"><label>원서 접수 시작일</label><input type="date" id="f_appstart" value="${a.applicationStart||''}"></div>
+      <div class="field"><label>원서 접수 마감일</label><input type="date" id="f_append" value="${a.applicationEnd||''}"></div>
+    </div>
+
+    <div class="row3">
       <div class="field"><label>1차 서류 합격 배수</label><input type="text" id="f_round1" placeholder="예: 3배수" value="${escapeHtml(a.round1Ratio)}"></div>
+      <div class="field"><label>서류(1차) 전형 발표일</label><input type="date" id="f_round1announce" value="${a.round1AnnounceDate||''}"></div>
       <div class="field"><label>면접 응시 배수</label><input type="text" id="f_ivratio" placeholder="예: 3배수" value="${escapeHtml(a.interviewRatio)}"></div>
     </div>
     <div class="row2">
@@ -659,6 +675,9 @@ function renderEditMode(){
     state.admissions[id] = {
       id, university, admissionType, department,
       isCardSchool: document.getElementById('f_iscard').checked,
+      applicationStart: document.getElementById('f_appstart').value,
+      applicationEnd: document.getElementById('f_append').value,
+      round1AnnounceDate: document.getElementById('f_round1announce').value,
       round1Ratio: document.getElementById('f_round1').value.trim(),
       interviewRatio: document.getElementById('f_ivratio').value.trim(),
       documentWeight: document.getElementById('f_docweight').value.trim(),
@@ -726,22 +745,26 @@ function loadSample(){
   state.admissions = {};
   const items = [
     {university:'한국대학교', admissionType:'학생부종합(미래인재)', department:'경영학과', isCardSchool:true,
-     round1Ratio:'3배수', interviewRatio:'3배수', interviewRequired:true, interviewDate: nextDate(20), interviewTime:'10:00',
+     applicationStart: nextDate(5), applicationEnd: nextDate(9), round1AnnounceDate: nextDate(15),
+     round1Ratio:'3배수', interviewRatio:'3배수', documentWeight:'70%', interviewWeight:'30%', interviewRequired:true, interviewDate: nextDate(20), interviewTime:'10:00',
      announceDate: nextDate(55), interviewTypes:['생기부 기반'], suneungChoi:false, suneungChoiText:'',
      recommendation:false, selfIntroRequired:true, selfIntroQuestions:['고교 재학 중 가장 의미 있었던 학업 경험을 서술하시오.','지원 동기와 진학 후 학업 계획을 서술하시오.'],
      cutoffNote:'작년 최종등록 평균 2.1등급', probability:'중', memo:'전공적합성 강조 필요'},
     {university:'한국대학교', admissionType:'논술전형', department:'경제학과', isCardSchool:true,
-     round1Ratio:'-', interviewRatio:'', interviewRequired:false, interviewDate:'', interviewTime:'',
+     applicationStart: nextDate(5), applicationEnd: nextDate(9), round1AnnounceDate:'',
+     round1Ratio:'-', interviewRatio:'', documentWeight:'', interviewWeight:'', interviewRequired:false, interviewDate:'', interviewTime:'',
      announceDate: nextDate(60), interviewTypes:[], suneungChoi:true, suneungChoiText:'국,수,영,탐 중 3개 합 6 이내',
      recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
      cutoffNote:'논술 경쟁률 40:1', probability:'하', memo:'수능 최저 충족 여부 우선 확인'},
     {university:'서울미래대학교', admissionType:'학생부교과(지역균형)', department:'컴퓨터공학과', isCardSchool:true,
-     round1Ratio:'5배수', interviewRatio:'없음', interviewRequired:false, interviewDate:'', interviewTime:'',
+     applicationStart: nextDate(3), applicationEnd: nextDate(7), round1AnnounceDate:'',
+     round1Ratio:'5배수', interviewRatio:'없음', documentWeight:'', interviewWeight:'', interviewRequired:false, interviewDate:'', interviewTime:'',
      announceDate: nextDate(50), interviewTypes:[], suneungChoi:true, suneungChoiText:'국,수,영,과 중 2개 합 4 이내',
      recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
      cutoffNote:'작년 컷 1.6등급', probability:'상', memo:'교과 성적 안정권'},
     {university:'서울미래대학교', admissionType:'학생부종합(창의인재)', department:'소프트웨어학과', isCardSchool:false,
-     round1Ratio:'4배수', interviewRatio:'4배수', interviewRequired:true, interviewDate: nextDate(25), interviewTime:'14:30',
+     applicationStart: nextDate(3), applicationEnd: nextDate(7), round1AnnounceDate: nextDate(18),
+     round1Ratio:'4배수', interviewRatio:'4배수', documentWeight:'0% (순수 면접 100%)', interviewWeight:'100%', interviewRequired:true, interviewDate: nextDate(25), interviewTime:'14:30',
      announceDate: nextDate(58), interviewTypes:['제시문 기반','특수(영어면접 등)'], suneungChoi:false, suneungChoiText:'',
      recommendation:true, selfIntroRequired:true, selfIntroQuestions:['전공 관련 탐구 활동 중 대표 사례를 서술하시오.'],
      cutoffNote:'특기자 전형 성격, 6장 카드 외 별도 지원', probability:'미정', memo:'영어 면접 준비 필요 - 스크립트 연습'},
