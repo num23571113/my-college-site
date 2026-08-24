@@ -94,6 +94,8 @@
   .adm-card .metaline{ font-size:11px; color:var(--text-soft); display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
   .adm-card .metaline span{ background:var(--bg-soft); padding:3px 8px; border-radius:5px; }
   .adm-card .cardtag{ position:absolute; top:14px; right:14px; font-size:10px; color:var(--accent-deep); font-weight:700; background:var(--accent-soft); padding:2px 8px; border-radius:8px; }
+  .adm-card .dup-btn{ position:absolute; bottom:12px; right:12px; font-size:10.5px; background:var(--bg-soft); border:1px solid var(--border); color:var(--text-soft); padding:4px 8px; border-radius:6px; }
+  .adm-card .dup-btn:hover{ background:var(--accent-soft); color:var(--accent-deep); border-color:var(--accent); }
 
   .empty-note{padding:50px 20px; text-align:center; color:var(--text-faint); font-size:13px; background:#fff; border-radius:var(--radius); border:1px solid var(--border); }
 
@@ -157,6 +159,12 @@
   .view-content{ font-size:13.5px; line-height:1.6; color:var(--text); white-space:pre-wrap; }
   .view-empty{ color:var(--text-faint); font-size:13px; font-style:italic; }
   .view-q{ background:var(--bg-soft); border-radius:8px; padding:9px 12px; margin-bottom:6px; font-size:13px; }
+  .file-list, .link-list{display:flex; flex-direction:column; gap:6px; margin-top:6px;}
+  .file-item, .link-item{ display:flex; align-items:center; justify-content:space-between; background:var(--bg-soft); border-radius:6px; padding:6px 9px; font-size:11.5px; }
+  .file-item a, .link-item a{color:var(--accent-deep); text-decoration:none; font-weight:600;}
+  .file-item a:hover, .link-item a:hover{text-decoration:underline;}
+  .view-file, .view-link{ display:block; font-size:13px; color:var(--accent-deep); text-decoration:none; margin-bottom:4px; }
+  .view-file:hover, .view-link:hover{ text-decoration:underline; }
 
   .field{margin-bottom:14px;}
   .field label{display:block; font-size:12.5px; font-weight:600; color:var(--text); margin-bottom:5px;}
@@ -312,6 +320,7 @@ if(!state.customEvents) state.customEvents = {};
 let editingId = null, modalMode = 'view';
 let editingEventId = null, isNewEvent = false;
 let tempIvTypes = [], tempQuestions = [], tempProb = '미정', tempPeriodColor = '#d97757';
+let tempFiles = [], tempLinks = [];
 let tempEventColor = '#3aa76d';
 let currentView = 'list';
 let calYear, calMonth;
@@ -520,10 +529,19 @@ function renderList(){
         <div class="stripe"></div>
         ${a.isCardSchool ? '<div class="cardtag">6장 카드</div>' : ''}
         <span class="badge prob-${a.probability||'미정'}">${a.probability||'미정'}</span>
-        <div class="type">${escapeHtml(a.admissionType||'전형명 미입력')}</div>
+        <div class="type">${escapeHtml(a.admissionType||'전형명 미입력')} ${(a.files&&a.files.length)?'📎':''}${(a.links&&a.links.length)?'🔗':''}</div>
         <div class="dept">${escapeHtml(a.department||'학과 미입력')}</div>
         <div class="metaline">${meta.map(m=>`<span>${escapeHtml(m)}</span>`).join('')}</div>
+        <button class="dup-btn" type="button">📋 복사</button>
       `;
+      card.querySelector('.dup-btn').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const newId = uid('adm');
+        state.admissions[newId] = { ...a, id:newId, department: a.department + ' (사본)' };
+        persist(); renderAll();
+        openModal(newId, 'edit');
+        showIndicator('복사되었습니다. 대학/학과를 수정해주세요.');
+      });
       card.addEventListener('click', ()=> openModal(a.id, 'view'));
       grid.appendChild(card);
     });
@@ -756,6 +774,16 @@ function renderViewMode(){
     </div>
 
     <div class="view-section">
+      <div class="label">첨부 파일 / 사진</div>
+      ${ (a.files&&a.files.length) ? a.files.map(f=>`<a class="view-file" href="${f.dataUrl}" target="_blank" rel="noopener">📎 ${escapeHtml(f.name)}</a>`).join('') : '<span class="view-empty">없음</span>' }
+    </div>
+
+    <div class="view-section">
+      <div class="label">관련 사이트 링크</div>
+      ${ (a.links&&a.links.length) ? a.links.map(l=>`<a class="view-link" href="${l.url}" target="_blank" rel="noopener">🔗 ${escapeHtml(l.url)}</a>`).join('') : '<span class="view-empty">없음</span>' }
+    </div>
+
+    <div class="view-section">
       <div class="label">작년 입시결과 / 참고사항</div>
       <div class="view-content">${a.cutoffNote ? escapeHtml(a.cutoffNote) : '<span class="view-empty">입력된 내용이 없습니다.</span>'}</div>
     </div>
@@ -767,11 +795,20 @@ function renderViewMode(){
 
     <div class="modal-actions">
       <div class="left"><button class="btn danger-text" id="vDeleteBtn">삭제</button></div>
-      <div class="left"><button class="btn" id="vCloseBtn">닫기</button><button class="btn primary" id="vEditBtn">✏️ 수정</button></div>
+      <div class="left"><button class="btn" id="vDupBtn">📋 복사해서 새로 만들기</button><button class="btn" id="vCloseBtn">닫기</button><button class="btn primary" id="vEditBtn">✏️ 수정</button></div>
     </div>
   `;
   document.getElementById('vCloseBtn').addEventListener('click', closeModal);
   document.getElementById('vEditBtn').addEventListener('click', ()=>{ modalMode='edit'; renderEditMode(); });
+  document.getElementById('vDupBtn').addEventListener('click', ()=>{
+    const orig = state.admissions[editingId];
+    const newId = uid('adm');
+    state.admissions[newId] = { ...orig, id:newId, university: orig.university, department: orig.department + ' (사본)' };
+    persist(); renderAll();
+    editingId = newId; modalMode='edit';
+    renderEditMode();
+    showIndicator('복사되었습니다. 대학/학과를 수정해주세요.');
+  });
   document.getElementById('vDeleteBtn').addEventListener('click', ()=>{
     if(!confirm('이 항목을 삭제할까요?')) return;
     delete state.admissions[editingId]; persist(); closeModal(); renderAll();
@@ -787,12 +824,14 @@ function renderEditMode(){
     round1Ratio:'', interviewRatio:'', documentWeight:'', interviewWeight:'',
     interviewRequired:false, interviewDate:'', interviewTime:'', announceDate:'', interviewTypes:[],
     suneungChoi:false, suneungChoiText:'', recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
-    cutoffNote:'', probability:'미정', memo:'' }; }
+    cutoffNote:'', probability:'미정', memo:'', files:[], links:[] }; }
 
   tempIvTypes = (a.interviewTypes||[]).slice();
   tempQuestions = (a.selfIntroQuestions||[]).slice();
   tempProb = a.probability || '미정';
   tempPeriodColor = a.periodColor || '#d97757';
+  tempFiles = (a.files||[]).slice();
+  tempLinks = (a.links||[]).slice();
 
   const modal = document.getElementById('modalBody');
   modal.innerHTML = `
@@ -859,6 +898,19 @@ function renderEditMode(){
     <div class="field"><label>작년 입시결과 / 수시컷 참고 (선택)</label><input type="text" id="f_cutoff" placeholder="예: 작년 최종등록 평균 2.3등급, 경쟁률 8:1" value="${escapeHtml(a.cutoffNote)}"></div>
 
     <div class="field">
+      <label>관련 사진 / 파일 첨부</label>
+      <input type="file" id="f_file" multiple>
+      <div class="file-list" id="fileList"></div>
+      <small class="hint">모집요강 캡처, 안내문 PDF 등을 첨부할 수 있습니다. 파일은 클라우드에 함께 저장됩니다.</small>
+    </div>
+    <div class="field">
+      <label>관련 사이트 링크</label>
+      <div style="display:flex; gap:6px;"><input type="url" id="f_linkurl" placeholder="https://..."><button class="btn" id="addLinkBtn" type="button" style="white-space:nowrap;">추가</button></div>
+      <div class="link-list" id="linkList"></div>
+      <small class="hint">해당 대학 입학처, 모집요강 페이지 등을 링크로 저장해두세요.</small>
+    </div>
+
+    <div class="field">
       <label>합격 가능성 (내 판단)</label>
       <div class="prob-select">
         <div class="prob-opt sel-상" data-v="상">상</div>
@@ -892,6 +944,20 @@ function renderEditMode(){
     });
   });
   renderQList();
+  renderFileList();
+  renderLinkList();
+  document.getElementById('f_file').addEventListener('change', (e)=>{
+    Array.from(e.target.files).forEach(file=>{
+      const reader = new FileReader();
+      reader.onload = ()=>{ tempFiles.push({name:file.name, dataUrl:reader.result}); renderFileList(); };
+      reader.readAsDataURL(file);
+    });
+    e.target.value='';
+  });
+  document.getElementById('addLinkBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('f_linkurl'); const url = input.value.trim();
+    if(url){ tempLinks.push({url}); input.value=''; renderLinkList(); }
+  });
   const PALETTE = ['#d97757','#3aa76d','#2f6fed','#b8860b','#9b2c2c','#7a4fd6','#0e9ba0','#e0518b'];
   const swWrap = document.getElementById('periodColorSwatches');
   function renderSwatches(){
@@ -946,6 +1012,8 @@ function renderEditMode(){
       cutoffNote: document.getElementById('f_cutoff').value.trim(),
       probability: tempProb,
       memo: document.getElementById('f_memo').value.trim(),
+      files: tempFiles,
+      links: tempLinks,
     };
     persist();
     editingId = id; modalMode='view';
@@ -963,6 +1031,26 @@ function renderQList(){
     const x = document.createElement('button'); x.className='x-btn'; x.textContent='✕';
     x.addEventListener('click', ()=>{ tempQuestions.splice(idx,1); renderQList(); });
     row.appendChild(ta); row.appendChild(x); list.appendChild(row);
+  });
+}
+function renderFileList(){
+  const list = document.getElementById('fileList'); if(!list) return; list.innerHTML='';
+  tempFiles.forEach((f, idx)=>{
+    const div = document.createElement('div'); div.className='file-item';
+    div.innerHTML = `<a href="${f.dataUrl}" target="_blank" rel="noopener">${escapeHtml(f.name)}</a>`;
+    const x = document.createElement('button'); x.className='x-btn'; x.textContent='✕';
+    x.addEventListener('click', ()=>{ tempFiles.splice(idx,1); renderFileList(); });
+    div.appendChild(x); list.appendChild(div);
+  });
+}
+function renderLinkList(){
+  const list = document.getElementById('linkList'); if(!list) return; list.innerHTML='';
+  tempLinks.forEach((l, idx)=>{
+    const div = document.createElement('div'); div.className='link-item';
+    div.innerHTML = `<a href="${l.url}" target="_blank" rel="noopener">${escapeHtml(l.url)}</a>`;
+    const x = document.createElement('button'); x.className='x-btn'; x.textContent='✕';
+    x.addEventListener('click', ()=>{ tempLinks.splice(idx,1); renderLinkList(); });
+    div.appendChild(x); list.appendChild(div);
   });
 }
 
