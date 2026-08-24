@@ -584,28 +584,65 @@ function renderCalendar(){
     .map(a=> ({ id:a.id, university:a.university, start:a.applicationStart, end:a.applicationEnd, color:a.periodColor||'#d97757' }));
 
   const totalCells = Math.ceil((startWeekday + daysInMonth) / 7) * 7;
+
+  // 1단계: 모든 셀의 날짜 정보를 먼저 계산
+  const cellInfos = [];
   for(let i=0;i<totalCells;i++){
     const dayNum = i - startWeekday + 1;
-    const cell = document.createElement('div'); cell.className='cal-day';
-    let realDate;
-    if(dayNum < 1){ realDate = new Date(calYear, calMonth-1, daysInPrevMonth+dayNum); cell.classList.add('other-month'); }
-    else if(dayNum > daysInMonth){ realDate = new Date(calYear, calMonth+1, dayNum-daysInMonth); cell.classList.add('other-month'); }
+    let realDate, otherMonth = false;
+    if(dayNum < 1){ realDate = new Date(calYear, calMonth-1, daysInPrevMonth+dayNum); otherMonth = true; }
+    else if(dayNum > daysInMonth){ realDate = new Date(calYear, calMonth+1, dayNum-daysInMonth); otherMonth = true; }
     else{ realDate = new Date(calYear, calMonth, dayNum); }
-    const dateStr = realDate.toISOString().slice(0,10);
+    cellInfos.push({ realDate, dateStr: realDate.toISOString().slice(0,10), otherMonth });
+  }
+
+  // 2단계: 한 주(7일) 단위로 기간 바의 레인(줄 번호)을 미리 배정해서, 같은 기간은 그 주 내내 같은 줄에 고정되도록 함
+  for(let w=0; w<cellInfos.length; w+=7){
+    const week = cellInfos.slice(w, w+7);
+    const weekStart = week[0].dateStr, weekEnd = week[6].dateStr;
+    const activeInWeek = periods
+      .filter(p=> p.end>=weekStart && p.start<=weekEnd)
+      .slice()
+      .sort((a,b)=> a.start.localeCompare(b.start) || a.id.localeCompare(b.id));
+    const laneEndDates = [];
+    const laneAssignment = {};
+    activeInWeek.forEach(p=>{
+      let lane = 0;
+      while(laneEndDates[lane] !== undefined && laneEndDates[lane] >= p.start) lane++;
+      laneEndDates[lane] = p.end;
+      laneAssignment[p.id] = lane;
+    });
+    const maxLane = activeInWeek.length ? Math.max(...activeInWeek.map(p=>laneAssignment[p.id])) : -1;
+    week.forEach(c=>{ c.laneAssignment = laneAssignment; c.maxLane = maxLane; });
+  }
+
+  // 3단계: 셀 렌더링 (배정된 레인 순서대로, 빈 레인은 투명 placeholder로 채워 높이 정렬 유지)
+  cellInfos.forEach(({realDate, dateStr, otherMonth, laneAssignment, maxLane})=>{
+    const cell = document.createElement('div'); cell.className='cal-day';
+    if(otherMonth) cell.classList.add('other-month');
     cell.innerHTML = `<div class="num">${realDate.getDate()}</div>`;
 
-    // 기간 바 (해당 날짜가 포함된 원서접수 기간들)
-    const activePeriods = periods.filter(p=> dateStr>=p.start && dateStr<=p.end);
-    if(activePeriods.length){
+    if(maxLane >= 0){
       const barsWrap = document.createElement('div'); barsWrap.className='period-bars';
-      activePeriods.forEach(p=>{
-        const bar = document.createElement('div');
-        bar.className = 'period-bar' + (dateStr===p.start?' is-start':'') + (dateStr===p.end?' is-end':'');
-        bar.style.background = p.color;
-        bar.title = `${p.university} 원서접수 (${p.start} ~ ${p.end})`;
-        bar.addEventListener('click', ()=> openModal(p.id, 'view'));
-        barsWrap.appendChild(bar);
-      });
+      const activePeriods = periods.filter(p=> dateStr>=p.start && dateStr<=p.end);
+      const byLane = {};
+      activePeriods.forEach(p=>{ byLane[laneAssignment[p.id]] = p; });
+      for(let lane=0; lane<=maxLane; lane++){
+        const p = byLane[lane];
+        if(p){
+          const bar = document.createElement('div');
+          bar.className = 'period-bar' + (dateStr===p.start?' is-start':'') + (dateStr===p.end?' is-end':'');
+          bar.style.background = p.color;
+          bar.title = `${p.university} 원서접수 (${p.start} ~ ${p.end})`;
+          bar.addEventListener('click', ()=> openModal(p.id, 'view'));
+          barsWrap.appendChild(bar);
+        }else{
+          const spacer = document.createElement('div');
+          spacer.className = 'period-bar';
+          spacer.style.visibility = 'hidden';
+          barsWrap.appendChild(spacer);
+        }
+      }
       cell.appendChild(barsWrap);
     }
 
@@ -618,7 +655,7 @@ function renderCalendar(){
       cell.appendChild(evEl);
     });
     grid.appendChild(cell);
-  }
+  });
 }
 document.getElementById('calPrev').addEventListener('click', ()=>{ calMonth--; if(calMonth<0){calMonth=11; calYear--;} renderCalendar(); });
 document.getElementById('calNext').addEventListener('click', ()=>{ calMonth++; if(calMonth>11){calMonth=0; calYear++;} renderCalendar(); });
