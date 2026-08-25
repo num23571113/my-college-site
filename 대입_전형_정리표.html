@@ -265,7 +265,8 @@
       <select id="sortSelect">
         <option value="prob">합격 가능성 높은 순</option>
         <option value="uni">대학 이름순</option>
-        <option value="date">면접/발표일 순</option>
+        <option value="interviewDate">면접일순</option>
+        <option value="announceDate">발표일순</option>
       </select>
       <span style="margin-left:6px;">필터</span>
       <select id="filterCard">
@@ -505,7 +506,8 @@ function renderList(){
   uniNames.forEach(uniName=>{
     let list = byUni[uniName].slice();
     if(sortMode==='prob'){ list.sort((a,b)=>PROB_ORDER[a.probability||'미정']-PROB_ORDER[b.probability||'미정']); }
-    else if(sortMode==='date'){ list.sort((a,b)=> (a.interviewDate||a.announceDate||'9999').localeCompare(b.interviewDate||b.announceDate||'9999')); }
+    else if(sortMode==='interviewDate'){ list.sort((a,b)=> (a.interviewDate||'9999').localeCompare(b.interviewDate||'9999')); }
+    else if(sortMode==='announceDate'){ list.sort((a,b)=> (a.announceDate||'9999').localeCompare(b.announceDate||'9999')); }
 
     const group = document.createElement('div'); group.className='uni-group';
     group.innerHTML = `<h2>${escapeHtml(uniName)} <span class="count">${list.length}개</span></h2>`;
@@ -517,7 +519,7 @@ function renderList(){
       if(a.applicationStart||a.applicationEnd) meta.push('원서접수 '+(a.applicationStart||'?')+'~'+(a.applicationEnd||'?'));
       if(a.round1Ratio) meta.push('1차 '+a.round1Ratio);
       if(a.round1AnnounceDate) meta.push('서류발표 '+a.round1AnnounceDate);
-      if(a.interviewRequired) meta.push('면접 '+(a.interviewRatio||'배수 미정'));
+      if(a.interviewRequired) meta.push('면접 있음');
       if(a.documentWeight) meta.push('서류비율 '+a.documentWeight);
       if(a.interviewWeight) meta.push('면접비율 '+a.interviewWeight);
       if(a.interviewDate) meta.push('면접일 '+a.interviewDate);
@@ -794,7 +796,6 @@ function renderViewMode(){
       <div class="view-item"><div class="label">원서 접수 기간</div><div class="val">${appPeriod}</div></div>
       <div class="view-item"><div class="label">서류(1차) 전형 발표일</div><div class="val">${a.round1AnnounceDate || '-'}</div></div>
       <div class="view-item"><div class="label">1차 서류 배수</div><div class="val">${escapeHtml(a.round1Ratio)||'-'}</div></div>
-      <div class="view-item"><div class="label">면접 응시 배수</div><div class="val">${escapeHtml(a.interviewRatio)||'-'}</div></div>
       <div class="view-item"><div class="label">서류 반영 비율</div><div class="val">${escapeHtml(a.documentWeight)||'-'}</div></div>
       <div class="view-item"><div class="label">면접 반영 비율</div><div class="val">${escapeHtml(a.interviewWeight)||'-'}</div></div>
       <div class="view-item"><div class="label">면접 여부</div><div class="val">${a.interviewRequired ? '있음' : '없음'}</div></div>
@@ -858,7 +859,7 @@ function renderEditMode(){
   if(!isNew){ a = state.admissions[editingId]; }
   else{ a = { university:'', admissionType:'', department:'', isCardSchool:true,
     applicationStart:'', applicationEnd:'', round1AnnounceDate:'',
-    round1Ratio:'', interviewRatio:'', documentWeight:'', interviewWeight:'',
+    round1Ratio:'', documentWeight:'', interviewWeight:'',
     interviewRequired:false, interviewDate:'', interviewTime:'', announceDate:'', interviewTypes:[],
     suneungChoi:false, suneungChoiText:'', recommendation:false, selfIntroRequired:false, selfIntroQuestions:[],
     cutoffNote:'', probability:'미정', memo:'', files:[], links:[] }; }
@@ -893,10 +894,9 @@ function renderEditMode(){
       <small class="hint">캘린더에서 원서접수 시작일~마감일이 선택한 색으로 이어져 표시됩니다.</small>
     </div>
 
-    <div class="row3">
+    <div class="row2">
       <div class="field"><label>1차 서류 합격 배수</label><input type="text" id="f_round1" placeholder="예: 3배수" value="${escapeHtml(a.round1Ratio)}"></div>
       <div class="field"><label>서류(1차) 전형 발표일</label><input type="date" id="f_round1announce" value="${a.round1AnnounceDate||''}"></div>
-      <div class="field"><label>면접 응시 배수</label><input type="text" id="f_ivratio" placeholder="예: 3배수" value="${escapeHtml(a.interviewRatio)}"></div>
     </div>
     <div class="row2">
       <div class="field"><label>서류 반영 비율</label><input type="text" id="f_docweight" placeholder="예: 70%" value="${escapeHtml(a.documentWeight)}"></div>
@@ -1033,7 +1033,6 @@ function renderEditMode(){
       periodColor: tempPeriodColor,
       round1AnnounceDate: document.getElementById('f_round1announce').value,
       round1Ratio: document.getElementById('f_round1').value.trim(),
-      interviewRatio: document.getElementById('f_ivratio').value.trim(),
       documentWeight: document.getElementById('f_docweight').value.trim(),
       interviewWeight: document.getElementById('f_ivweight').value.trim(),
       interviewRequired: document.getElementById('f_ivrequired').checked,
