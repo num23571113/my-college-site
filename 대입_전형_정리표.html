@@ -910,7 +910,7 @@ function renderViewMode(){
 
     <div class="view-section">
       <div class="label">관련 사이트 링크</div>
-      ${ (a.links&&a.links.length) ? a.links.map(l=>`<a class="view-link" href="${l.url}" target="_blank" rel="noopener">🔗 ${escapeHtml(l.url)}</a>`).join('') : '<span class="view-empty">없음</span>' }
+      ${ (a.links&&a.links.length) ? a.links.map(l=>`<a class="view-link" href="${l.url}" target="_blank" rel="noopener">🔗 ${escapeHtml(l.desc||l.url)}</a>`).join('') : '<span class="view-empty">없음</span>' }
     </div>
 
     <div class="view-section">
@@ -1034,9 +1034,13 @@ function renderEditMode(){
     </div>
     <div class="field">
       <label>관련 사이트 링크</label>
-      <div style="display:flex; gap:6px;"><input type="url" id="f_linkurl" placeholder="https://..."><button class="btn" id="addLinkBtn" type="button" style="white-space:nowrap;">추가</button></div>
+      <div class="row2">
+        <input type="url" id="f_linkurl" placeholder="https://...">
+        <input type="text" id="f_linkdesc" placeholder="이 링크에 대한 간단한 설명 (선택)">
+      </div>
+      <button class="btn" id="addLinkBtn" type="button" style="white-space:nowrap; margin-top:6px;">+ 링크 추가</button>
       <div class="link-list" id="linkList"></div>
-      <small class="hint">해당 대학 입학처, 모집요강 페이지 등을 링크로 저장해두세요.</small>
+      <small class="hint">해당 대학 입학처, 모집요강 페이지 등을 링크로 저장해두세요. 설명을 입력하면 그 설명 글자가 하이퍼링크가 되어, 클릭하면 새 탭으로 열립니다.</small>
     </div>
 
     <div class="field">
@@ -1084,8 +1088,9 @@ function renderEditMode(){
     e.target.value='';
   });
   document.getElementById('addLinkBtn').addEventListener('click', ()=>{
-    const input = document.getElementById('f_linkurl'); const url = input.value.trim();
-    if(url){ tempLinks.push({url}); input.value=''; renderLinkList(); }
+    const urlInput = document.getElementById('f_linkurl'), descInput = document.getElementById('f_linkdesc');
+    const url = urlInput.value.trim(), desc = descInput.value.trim();
+    if(url){ tempLinks.push({url, desc}); urlInput.value=''; descInput.value=''; renderLinkList(); }
   });
   const PALETTE = ['#d97757','#3aa76d','#2f6fed','#b8860b','#9b2c2c','#7a4fd6','#0e9ba0','#e0518b'];
   const swWrap = document.getElementById('periodColorSwatches');
@@ -1175,7 +1180,7 @@ function renderLinkList(){
   const list = document.getElementById('linkList'); if(!list) return; list.innerHTML='';
   tempLinks.forEach((l, idx)=>{
     const div = document.createElement('div'); div.className='link-item';
-    div.innerHTML = `<a href="${l.url}" target="_blank" rel="noopener">${escapeHtml(l.url)}</a>`;
+    div.innerHTML = `<a href="${l.url}" target="_blank" rel="noopener">${escapeHtml(l.desc||l.url)}</a>`;
     const x = document.createElement('button'); x.className='x-btn'; x.textContent='✕';
     x.addEventListener('click', ()=>{ tempLinks.splice(idx,1); renderLinkList(); });
     div.appendChild(x); list.appendChild(div);

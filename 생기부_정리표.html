@@ -192,6 +192,25 @@
   .roster-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px; flex-wrap:wrap;}
   .picker-row{ display:flex; gap:8px; margin-bottom:14px; }
   .picker-row select{ flex:1; padding:9px 11px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; }
+
+  /* 내용 편집 툴바 (하이라이트) */
+  .content-toolbar{ display:flex; gap:6px; margin-bottom:6px; flex-wrap:wrap; align-items:center; }
+  .content-toolbar button{ font-size:11.5px; border:1px solid var(--border); background:#fff; color:var(--text-soft); padding:5px 9px; border-radius:6px; }
+  .content-toolbar button:hover{ background:var(--bg-soft); }
+  .content-toolbar button.hl-yellow{ background:#fff59d; color:#665c00; border-color:#f0e08a; }
+  .content-toolbar button.hl-green{ background:#c8f7c5; color:#1f5c1a; border-color:#a9e6a4; }
+  .content-toolbar button.hl-pink{ background:#ffd6e7; color:#7a1f45; border-color:#f5b8d0; }
+  .content-toolbar .hint-inline{ color:var(--text-faint); font-size:10.5px; margin-left:4px; }
+  #f_content{ width:100%; min-height:90px; padding:9px 11px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; background:#fff; color:var(--text); line-height:1.55; outline:none; }
+  #f_content:focus{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+  #f_content:empty:before{ content:attr(data-placeholder); color:var(--text-faint); }
+  .view-content mark{ border-radius:2px; padding:0 1px; }
+
+  /* 연계 활동 검색/필터 */
+  .conn-search-row{ display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
+  .conn-search-row input[type=text]{ flex:1; min-width:140px; padding:7px 10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:12.5px; }
+  .conn-search-row select{ padding:7px 8px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:12.5px; background:#fff; }
+  .conn-empty{ color:var(--text-faint); font-size:12px; padding:6px 2px; }
 </style>
 </head>
 <body>
@@ -297,10 +316,12 @@ let editingEntryId = null, editingContext = null, modalMode = 'view'; // 'view' 
 let tempFiles = [], tempLinks = [], tempConnections = [];
 let editMode = false; // 보기모드(기본) / 편집모드 - 활동추가 칸 표시 여부
 let dragSubjectId = null;
+let connFilterSubject = '', connFilterSem = '', connSearchText = '';
 
 function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
 function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function semLabel(sem){ return sem ? `${sem.label} ${sem.sub}` : ''; }
+function stripHtml(html){ const d = document.createElement('div'); d.innerHTML = html||''; return d.textContent || d.innerText || ''; }
 
 /* ---------- Firebase ---------- */
 let fbAuth=null, fbDb=null, currentUser=null, cloudReady=false;
@@ -542,7 +563,7 @@ function renderBody(){
           ${entry.award ? `<div class="tag">🏅 수상</div>` : ''}
           ${entry.selfIntro ? `<div class="tag self-intro-tag">📝 자소서 예정</div>` : ''}
           <div class="t">${escapeHtml(entry.title || '(제목 없음)')}</div>
-          <div class="snippet">${escapeHtml(entry.content || '')}</div>`;
+          <div class="snippet">${escapeHtml(stripHtml(entry.content || ''))}</div>`;
         card.addEventListener('click', ()=> openModal(entry.id, null, 'view'));
         td.appendChild(card);
       });
@@ -614,7 +635,7 @@ function renderViewMode(){
 
     <div class="view-section">
       <div class="label">내용</div>
-      <div class="view-content">${entry.content ? escapeHtml(entry.content) : '<span class="view-empty">작성된 내용이 없습니다.</span>'}</div>
+      <div class="view-content">${entry.content && entry.content.trim() ? entry.content : '<span class="view-empty">작성된 내용이 없습니다.</span>'}</div>
     </div>
 
     <div class="view-section">
@@ -624,7 +645,7 @@ function renderViewMode(){
 
     <div class="view-section">
       <div class="label">참고 링크</div>
-      ${ (entry.links&&entry.links.length) ? entry.links.map(l=>`<a class="view-link" href="${l.url}" target="_blank" rel="noopener">🔗 ${escapeHtml(l.url)}</a>`).join('') : '<span class="view-empty">없음</span>' }
+      ${ (entry.links&&entry.links.length) ? entry.links.map(l=>`<a class="view-link" href="${l.url}" target="_blank" rel="noopener">🔗 ${escapeHtml(l.desc||l.url)}</a>`).join('') : '<span class="view-empty">없음</span>' }
     </div>
 
     <div class="view-section">
@@ -670,18 +691,33 @@ function renderEditMode(){
 
   tempFiles = (entry.files||[]).slice(); tempLinks = (entry.links||[]).slice(); tempConnections = (entry.connections||[]).slice();
 
+  connFilterSubject = ''; connFilterSem = ''; connSearchText = '';
+
   const modal = document.getElementById('modalBody');
   modal.innerHTML = `
     <h2>${isNew ? '새 활동 입력' : '활동 편집'}</h2>
     <div class="sub">${subj?subj.name:''} · ${semLabel(sem)}</div>
 
     <div class="field"><label>제목</label><input type="text" id="f_title" placeholder="예: 교내 과학탐구발표대회 참가" value="${escapeHtml(entry.title||'')}"></div>
-    <div class="field"><label>내용</label><textarea id="f_content" placeholder="생기부 원문 또는 요약 내용을 입력하세요">${escapeHtml(entry.content||'')}</textarea></div>
+    <div class="field">
+      <label>내용</label>
+      <div class="content-toolbar">
+        <button type="button" class="hl-yellow" id="hlYellowBtn" title="형광펜 (노랑) — Ctrl+H">🖍 형광펜</button>
+        <button type="button" class="hl-green" id="hlGreenBtn" title="형광펜 (초록)">🖍 초록</button>
+        <button type="button" class="hl-pink" id="hlPinkBtn" title="형광펜 (분홍)">🖍 분홍</button>
+        <button type="button" id="hlClearBtn" title="형광펜 지우기">지우기</button>
+        <button type="button" id="hlBoldBtn" title="굵게"><b>B</b></button>
+        <span class="hint-inline">텍스트를 드래그해서 선택한 뒤 버튼을 누르세요 (단축키 Ctrl+H = 노랑 형광펜)</span>
+      </div>
+      <div id="f_content" contenteditable="true" data-placeholder="생기부 원문 또는 요약 내용을 입력하세요">${entry.content||''}</div>
+    </div>
     <div class="row2">
       <div class="field checkline" style="margin-bottom:0;"><input type="checkbox" id="f_award" ${entry.award?'checked':''}><label for="f_award" style="margin:0;">수상 기록입니다</label></div>
       <div class="field" style="margin-bottom:0;"><input type="text" id="f_awardname" placeholder="수상명 (해당 시)" value="${escapeHtml(entry.awardName||'')}"></div>
     </div>
     <div class="field checkline"><input type="checkbox" id="f_selfintro" ${entry.selfIntro?'checked':''}><label for="f_selfintro" style="margin:0;">자기소개서에 활용할 예정입니다</label></div>
+    <div class="field"><label>메모 (추가로 공부할 내용 / 자소서 활용 여부 / 다음 학기 연결점)</label>
+      <textarea id="f_memo" placeholder="예: 3학년 세특과 연결 가능 / 자소서 2번 문항에 활용 예정">${escapeHtml(entry.memo||'')}</textarea></div>
     <div class="field">
       <label>사진 / 보고서 파일 첨부</label>
       <input type="file" id="f_file" multiple>
@@ -690,13 +726,24 @@ function renderEditMode(){
     </div>
     <div class="field">
       <label>참고 자료 링크</label>
-      <div style="display:flex; gap:6px;"><input type="url" id="f_linkurl" placeholder="https://..."><button class="btn" id="addLinkBtn" type="button" style="white-space:nowrap;">추가</button></div>
+      <div class="row2">
+        <input type="url" id="f_linkurl" placeholder="https://...">
+        <input type="text" id="f_linkdesc" placeholder="이 링크에 대한 간단한 설명 (선택)">
+      </div>
+      <button class="btn" id="addLinkBtn" type="button" style="white-space:nowrap; margin-top:6px;">+ 링크 추가</button>
       <div class="link-list" id="linkList"></div>
+      <small class="hint">설명을 입력하면 그 설명 글자가 하이퍼링크가 되어, 클릭하면 새 탭으로 링크가 열립니다.</small>
     </div>
-    <div class="field"><label>메모 (추가로 공부할 내용 / 자소서 활용 여부 / 다음 학기 연결점)</label>
-      <textarea id="f_memo" placeholder="예: 3학년 세특과 연결 가능 / 자소서 2번 문항에 활용 예정">${escapeHtml(entry.memo||'')}</textarea></div>
-    <div class="field"><label>다른 활동과 연계 표시</label><div class="conn-list" id="connList"></div>
-      <small class="hint">칩을 클릭하면 연계(선 연결)가 켜지거나 꺼집니다.</small></div>
+    <div class="field">
+      <label>다른 활동과 연계 표시</label>
+      <div class="conn-search-row">
+        <input type="text" id="connSearchInput" placeholder="제목으로 검색...">
+        <select id="connSubjSelect"><option value="">전체 과목</option>${state.subjects.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
+        <select id="connSemSelect"><option value="">전체 학기</option>${SEMESTERS.map(s=>`<option value="${s.id}">${s.label} ${s.sub}</option>`).join('')}</select>
+      </div>
+      <div class="conn-list" id="connList"></div>
+      <small class="hint">과목/학기를 고르거나 제목을 검색해 활동을 좁힌 뒤, 칩을 클릭하면 연계(선 연결)가 켜지거나 꺼집니다.</small>
+    </div>
 
     <div class="modal-actions">
       <div class="left">${!isNew ? '<button class="btn danger-text" id="eDeleteBtn">삭제</button>' : ''}</div>
@@ -705,6 +752,24 @@ function renderEditMode(){
   `;
 
   renderFileList(); renderLinkList(); renderConnList();
+
+  const contentBox = document.getElementById('f_content');
+  function applyHighlight(color){
+    contentBox.focus();
+    try{ document.execCommand('styleWithCSS', false, true); }catch(err){}
+    document.execCommand('hiliteColor', false, color);
+  }
+  document.getElementById('hlYellowBtn').addEventListener('click', ()=> applyHighlight('#fff59d'));
+  document.getElementById('hlGreenBtn').addEventListener('click', ()=> applyHighlight('#c8f7c5'));
+  document.getElementById('hlPinkBtn').addEventListener('click', ()=> applyHighlight('#ffd6e7'));
+  document.getElementById('hlClearBtn').addEventListener('click', ()=> applyHighlight('transparent'));
+  document.getElementById('hlBoldBtn').addEventListener('click', ()=>{ contentBox.focus(); document.execCommand('bold'); });
+  contentBox.addEventListener('keydown', (e)=>{
+    if((e.ctrlKey || e.metaKey) && (e.key==='h' || e.key==='H' || e.code==='KeyH')){
+      e.preventDefault();
+      applyHighlight('#fff59d');
+    }
+  });
 
   document.getElementById('f_file').addEventListener('change', (e)=>{
     Array.from(e.target.files).forEach(file=>{
@@ -716,9 +781,13 @@ function renderEditMode(){
     e.target.value='';
   });
   document.getElementById('addLinkBtn').addEventListener('click', ()=>{
-    const input = document.getElementById('f_linkurl'); const url = input.value.trim();
-    if(url){ tempLinks.push({url}); input.value=''; renderLinkList(); }
+    const urlInput = document.getElementById('f_linkurl'), descInput = document.getElementById('f_linkdesc');
+    const url = urlInput.value.trim(), desc = descInput.value.trim();
+    if(url){ tempLinks.push({url, desc}); urlInput.value=''; descInput.value=''; renderLinkList(); }
   });
+  document.getElementById('connSearchInput').addEventListener('input', (e)=>{ connSearchText = e.target.value; renderConnList(); });
+  document.getElementById('connSubjSelect').addEventListener('change', (e)=>{ connFilterSubject = e.target.value; renderConnList(); });
+  document.getElementById('connSemSelect').addEventListener('change', (e)=>{ connFilterSem = e.target.value; renderConnList(); });
   document.getElementById('eCancelBtn').addEventListener('click', ()=>{
     if(isNew) closeModal(); else { modalMode='view'; renderViewMode(); }
   });
@@ -731,7 +800,7 @@ function renderEditMode(){
   document.getElementById('eSaveBtn').addEventListener('click', ()=>{
     const title = document.getElementById('f_title').value.trim();
     if(!title){ alert('제목을 입력해주세요.'); return; }
-    const content = document.getElementById('f_content').value.trim();
+    const content = document.getElementById('f_content').innerHTML.trim();
     const award = document.getElementById('f_award').checked;
     const awardName = document.getElementById('f_awardname').value.trim();
     const selfIntro = document.getElementById('f_selfintro').checked;
@@ -769,7 +838,7 @@ function renderLinkList(){
   const list = document.getElementById('linkList'); if(!list) return; list.innerHTML='';
   tempLinks.forEach((l, idx)=>{
     const div = document.createElement('div'); div.className='link-item';
-    div.innerHTML = `<a href="${l.url}" target="_blank" rel="noopener">${escapeHtml(l.url)}</a>`;
+    div.innerHTML = `<a href="${l.url}" target="_blank" rel="noopener">${escapeHtml(l.desc||l.url)}</a>`;
     const x = document.createElement('button'); x.className='x-btn'; x.textContent='✕';
     x.addEventListener('click', ()=>{ tempLinks.splice(idx,1); renderLinkList(); });
     div.appendChild(x); list.appendChild(div);
@@ -777,8 +846,15 @@ function renderLinkList(){
 }
 function renderConnList(){
   const list = document.getElementById('connList'); if(!list) return; list.innerHTML='';
-  const others = Object.values(state.entries).filter(e=> e.id !== editingEntryId);
+  let others = Object.values(state.entries).filter(e=> e.id !== editingEntryId);
   if(others.length===0){ list.innerHTML = '<small class="hint">연결할 다른 활동이 아직 없습니다.</small>'; return; }
+  if(connFilterSubject) others = others.filter(o=> o.subjectId === connFilterSubject);
+  if(connFilterSem) others = others.filter(o=> o.semId === connFilterSem);
+  if(connSearchText && connSearchText.trim()){
+    const q = connSearchText.trim().toLowerCase();
+    others = others.filter(o=> (o.title||'').toLowerCase().includes(q));
+  }
+  if(others.length===0){ list.innerHTML = '<div class="conn-empty">조건에 맞는 활동이 없습니다. 검색어나 필터를 조정해보세요.</div>'; return; }
   others.forEach(o=>{
     const subj = state.subjects.find(s=>s.id===o.subjectId), sem = SEMESTERS.find(s=>s.id===o.semId);
     const chip = document.createElement('div'); chip.className='conn-chip' + (tempConnections.includes(o.id)?' active':'');
@@ -814,7 +890,7 @@ function openAwardsRoster(){
     row.innerHTML = `<div class="rt">
         <div class="title">🏅 ${escapeHtml(entry.title||'(제목없음)')} ${entry.awardName?('· '+escapeHtml(entry.awardName)):''}</div>
         <div class="meta">${subj?escapeHtml(subj.name):'?'} · ${semLabel(sem)}</div>
-        <div class="snippet">${escapeHtml(entry.content||'')}</div>
+        <div class="snippet">${escapeHtml(stripHtml(entry.content||''))}</div>
       </div>`;
     row.addEventListener('click', ()=>{ modal.classList.remove('wide'); openModal(entry.id, null, 'view'); });
     list.appendChild(row);
@@ -850,7 +926,7 @@ function openSelfIntroRoster(){
       <div class="rt">
         <div class="title">${entry.award?'🏅 ':''}${escapeHtml(entry.title||'(제목없음)')}</div>
         <div class="meta">${subj?escapeHtml(subj.name):'?'} · ${semLabel(sem)}</div>
-        <div class="snippet">${escapeHtml(entry.memo || entry.content || '')}</div>
+        <div class="snippet">${escapeHtml(entry.memo || stripHtml(entry.content||'') || '')}</div>
       </div>`;
     row.querySelector('.roster-check').addEventListener('click', (e)=>{
       e.stopPropagation();
