@@ -753,11 +753,11 @@ function renderEditMode(){
     <div class="field">
       <label>다른 활동과 연계 표시</label>
       <div class="conn-search-row">
-        <input type="text" id="connSearchInput" placeholder="제목으로 검색해서 추가...">
+        <input type="text" id="connSearchInput" placeholder="제목, 과목, 학기로 검색해서 추가...">
       </div>
       <div class="conn-search-results" id="connSearchResults"></div>
       <div class="conn-list" id="connList"></div>
-      <small class="hint">검색으로 활동을 찾아 추가하세요. 아래에는 현재 연계된 활동만 표시됩니다. 칩을 클릭하면 연계가 해제됩니다.</small>
+      <small class="hint">제목뿐 아니라 과목명·학기(예: "수학", "2학년 1학기")로도 검색할 수 있어요. 아래에는 현재 연계된 활동만 표시됩니다. 칩을 클릭하면 연계가 해제됩니다.</small>
     </div>
 
     <div class="modal-actions">
@@ -876,7 +876,12 @@ function renderConnSearchResults(){
   wrap.innerHTML = '';
   if(!q) return;
   const matches = Object.values(state.entries)
-    .filter(e=> e.id !== editingEntryId && !tempConnections.includes(e.id) && (e.title||'').toLowerCase().includes(q))
+    .filter(e=> {
+      if(e.id === editingEntryId || tempConnections.includes(e.id)) return false;
+      const subj = state.subjects.find(s=>s.id===e.subjectId), sem = SEMESTERS.find(s=>s.id===e.semId);
+      const haystack = [e.title||'', subj?subj.name:'', sem?sem.label:'', sem?sem.sub:'', sem?(sem.label+' '+sem.sub):''].join(' ').toLowerCase();
+      return haystack.includes(q);
+    })
     .slice(0, 8);
   if(matches.length===0){ wrap.innerHTML = '<div class="conn-empty">일치하는 활동이 없습니다.</div>'; return; }
   matches.forEach(o=>{
