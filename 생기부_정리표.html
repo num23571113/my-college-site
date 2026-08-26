@@ -109,7 +109,8 @@
   .subj-btns button{ width:18px; height:15px; font-size:9px; border:none; background:var(--bg-soft); color:var(--text-faint); border-radius:3px; line-height:1; padding:0; }
   .subj-btns button:hover{ background:var(--accent-soft); color:var(--accent-deep); }
   .drag-handle{ color:var(--text-faint); font-size:11px; cursor:grab; padding:0 2px; }
-  .arrow{ display:inline-block; margin-right:4px; transition:transform .15s; color:var(--text-faint); font-size:10px; cursor:pointer; }
+  .arrow{ display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; margin-right:2px; transition:transform .15s; color:var(--text-soft); font-size:15px; cursor:pointer; border-radius:6px; }
+  .arrow:hover{ background:var(--bg-soft); color:var(--text); }
   tr.collapsed td.cell{ display:none; }
   tr.collapsed .arrow{transform:rotate(-90deg);}
 
@@ -118,7 +119,6 @@
     border-radius:7px; padding:7px 6px; font-size:11.5px; margin-top:4px; }
   .add-entry:hover{border-color:var(--accent); color:var(--accent-deep); background:var(--accent-soft);}
   .board.compact-mode .add-entry{ display:none; }
-  .board.compact-mode td.cell:hover .add-entry{ display:block; }
 
   .entry-card{ background:#fff; border:1px solid var(--border); border-radius:8px;
     padding:9px 10px; margin-bottom:6px; box-shadow:var(--shadow-sm); position:relative; transition:.12s; }
@@ -168,8 +168,8 @@
   .conn-list{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
   .conn-chip{ font-size:11px; background:var(--bg-soft); color:var(--text-soft); border:1px solid var(--border); padding:5px 10px; border-radius:14px; }
   .conn-chip.active{background:var(--text); color:#fff; border-color:var(--text);}
-  .modal-actions{display:flex; justify-content:space-between; margin-top:20px; gap:8px;}
-  .modal-actions .left{display:flex; gap:8px;}
+  .modal-actions{display:flex; justify-content:space-between; margin-top:20px; gap:8px; flex-wrap:wrap;}
+  .modal-actions .left{display:flex; gap:8px; flex-wrap:wrap;}
   small.hint{color:var(--text-faint); font-size:11px;}
   input[type=file]{font-size:11.5px;}
 
@@ -209,7 +209,8 @@
   /* 연계 활동 검색/필터 */
   .conn-search-row{ display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
   .conn-search-row input[type=text]{ flex:1; min-width:140px; padding:7px 10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:12.5px; }
-  .conn-search-row select{ padding:7px 8px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:12.5px; background:#fff; }
+  .conn-search-results{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .conn-chip.suggest{ border-style:dashed; color:var(--accent-deep); border-color:var(--accent); background:var(--accent-soft); }
   .conn-empty{ color:var(--text-faint); font-size:12px; padding:6px 2px; }
 </style>
 </head>
@@ -279,7 +280,7 @@
     <span><span class="dot" style="background:#cfcfcf;"></span>일반 활동</span>
     <span><span class="dot" style="background:var(--award);"></span>수상 기록</span>
     <span>· 점선으로 이어진 카드는 서로 연계된 활동입니다</span>
-    <span>· "보기 모드"에서는 활동 추가 칸이 숨겨져 더 깔끔하게 볼 수 있어요 (칸에 마우스를 올리면 다시 보입니다)</span>
+    <span>· "편집 모드"를 켜야 활동 추가 칸이 보입니다. 평소에는 "보기 모드"로 깔끔하게 볼 수 있어요.</span>
     <span>· 과목 이름을 클릭한 채로 위아래로 끌면 순서를 바꿀 수 있어요</span>
   </div>
   <div class="board" id="boardScroll">
@@ -316,7 +317,7 @@ let editingEntryId = null, editingContext = null, modalMode = 'view'; // 'view' 
 let tempFiles = [], tempLinks = [], tempConnections = [];
 let editMode = false; // 보기모드(기본) / 편집모드 - 활동추가 칸 표시 여부
 let dragSubjectId = null;
-let connFilterSubject = '', connFilterSem = '', connSearchText = '';
+let connSearchText = '';
 
 function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
 function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -666,11 +667,26 @@ function renderViewMode(){
 
     <div class="modal-actions">
       <div class="left"><button class="btn danger-text" id="vDeleteBtn">삭제</button></div>
-      <div class="left"><button class="btn" id="vCloseBtn">닫기</button><button class="btn primary" id="vEditBtn">✏️ 수정</button></div>
+      <div class="left"><button class="btn" id="vDupBtn">📋 복사해서 세부활동 만들기</button><button class="btn" id="vCloseBtn">닫기</button><button class="btn primary" id="vEditBtn">✏️ 수정</button></div>
     </div>
   `;
   document.getElementById('vCloseBtn').addEventListener('click', closeModal);
   document.getElementById('vEditBtn').addEventListener('click', ()=>{ modalMode='edit'; renderEditMode(); });
+  document.getElementById('vDupBtn').addEventListener('click', ()=>{
+    const orig = state.entries[editingEntryId];
+    const newId = uid('entry');
+    state.entries[newId] = {
+      ...orig, id:newId,
+      title: (orig.title||'') + ' - 세부활동',
+      files: (orig.files||[]).slice(),
+      links: (orig.links||[]).slice(),
+      connections: []
+    };
+    persist(); render();
+    editingEntryId = newId; modalMode='edit';
+    renderEditMode();
+    showIndicator('원문 내용이 복사되었습니다. 세부 내용으로 정리해보세요.');
+  });
   document.getElementById('vDeleteBtn').addEventListener('click', ()=>{
     if(!confirm('이 활동을 삭제할까요?')) return;
     const id = editingEntryId;
@@ -691,7 +707,7 @@ function renderEditMode(){
 
   tempFiles = (entry.files||[]).slice(); tempLinks = (entry.links||[]).slice(); tempConnections = (entry.connections||[]).slice();
 
-  connFilterSubject = ''; connFilterSem = ''; connSearchText = '';
+  connSearchText = '';
 
   const modal = document.getElementById('modalBody');
   modal.innerHTML = `
@@ -737,12 +753,11 @@ function renderEditMode(){
     <div class="field">
       <label>다른 활동과 연계 표시</label>
       <div class="conn-search-row">
-        <input type="text" id="connSearchInput" placeholder="제목으로 검색...">
-        <select id="connSubjSelect"><option value="">전체 과목</option>${state.subjects.map(s=>`<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('')}</select>
-        <select id="connSemSelect"><option value="">전체 학기</option>${SEMESTERS.map(s=>`<option value="${s.id}">${s.label} ${s.sub}</option>`).join('')}</select>
+        <input type="text" id="connSearchInput" placeholder="제목으로 검색해서 추가...">
       </div>
+      <div class="conn-search-results" id="connSearchResults"></div>
       <div class="conn-list" id="connList"></div>
-      <small class="hint">과목/학기를 고르거나 제목을 검색해 활동을 좁힌 뒤, 칩을 클릭하면 연계(선 연결)가 켜지거나 꺼집니다.</small>
+      <small class="hint">검색으로 활동을 찾아 추가하세요. 아래에는 현재 연계된 활동만 표시됩니다. 칩을 클릭하면 연계가 해제됩니다.</small>
     </div>
 
     <div class="modal-actions">
@@ -751,7 +766,7 @@ function renderEditMode(){
     </div>
   `;
 
-  renderFileList(); renderLinkList(); renderConnList();
+  renderFileList(); renderLinkList(); renderConnList(); renderConnSearchResults();
 
   const contentBox = document.getElementById('f_content');
   function applyHighlight(color){
@@ -785,9 +800,7 @@ function renderEditMode(){
     const url = urlInput.value.trim(), desc = descInput.value.trim();
     if(url){ tempLinks.push({url, desc}); urlInput.value=''; descInput.value=''; renderLinkList(); }
   });
-  document.getElementById('connSearchInput').addEventListener('input', (e)=>{ connSearchText = e.target.value; renderConnList(); });
-  document.getElementById('connSubjSelect').addEventListener('change', (e)=>{ connFilterSubject = e.target.value; renderConnList(); });
-  document.getElementById('connSemSelect').addEventListener('change', (e)=>{ connFilterSem = e.target.value; renderConnList(); });
+  document.getElementById('connSearchInput').addEventListener('input', (e)=>{ connSearchText = e.target.value; renderConnSearchResults(); });
   document.getElementById('eCancelBtn').addEventListener('click', ()=>{
     if(isNew) closeModal(); else { modalMode='view'; renderViewMode(); }
   });
@@ -846,21 +859,39 @@ function renderLinkList(){
 }
 function renderConnList(){
   const list = document.getElementById('connList'); if(!list) return; list.innerHTML='';
-  let others = Object.values(state.entries).filter(e=> e.id !== editingEntryId);
-  if(others.length===0){ list.innerHTML = '<small class="hint">연결할 다른 활동이 아직 없습니다.</small>'; return; }
-  if(connFilterSubject) others = others.filter(o=> o.subjectId === connFilterSubject);
-  if(connFilterSem) others = others.filter(o=> o.semId === connFilterSem);
-  if(connSearchText && connSearchText.trim()){
-    const q = connSearchText.trim().toLowerCase();
-    others = others.filter(o=> (o.title||'').toLowerCase().includes(q));
-  }
-  if(others.length===0){ list.innerHTML = '<div class="conn-empty">조건에 맞는 활동이 없습니다. 검색어나 필터를 조정해보세요.</div>'; return; }
-  others.forEach(o=>{
+  if(tempConnections.length===0){ list.innerHTML = '<div class="conn-empty">아직 연계된 활동이 없습니다. 위 검색창에서 찾아 추가해보세요.</div>'; return; }
+  tempConnections.forEach(id=>{
+    const o = state.entries[id]; if(!o) return;
     const subj = state.subjects.find(s=>s.id===o.subjectId), sem = SEMESTERS.find(s=>s.id===o.semId);
-    const chip = document.createElement('div'); chip.className='conn-chip' + (tempConnections.includes(o.id)?' active':'');
+    const chip = document.createElement('div'); chip.className='conn-chip active';
+    chip.title = '클릭하면 연계 해제';
     chip.textContent = `${subj?subj.name:'?'} · ${semLabel(sem)} · ${o.title||'(제목없음)'}`;
-    chip.addEventListener('click', ()=>{ const i=tempConnections.indexOf(o.id); if(i>=0) tempConnections.splice(i,1); else tempConnections.push(o.id); chip.classList.toggle('active'); });
+    chip.addEventListener('click', ()=>{ tempConnections = tempConnections.filter(x=>x!==id); renderConnList(); renderConnSearchResults(); });
     list.appendChild(chip);
+  });
+}
+function renderConnSearchResults(){
+  const wrap = document.getElementById('connSearchResults'); if(!wrap) return;
+  const q = (connSearchText||'').trim().toLowerCase();
+  wrap.innerHTML = '';
+  if(!q) return;
+  const matches = Object.values(state.entries)
+    .filter(e=> e.id !== editingEntryId && !tempConnections.includes(e.id) && (e.title||'').toLowerCase().includes(q))
+    .slice(0, 8);
+  if(matches.length===0){ wrap.innerHTML = '<div class="conn-empty">일치하는 활동이 없습니다.</div>'; return; }
+  matches.forEach(o=>{
+    const subj = state.subjects.find(s=>s.id===o.subjectId), sem = SEMESTERS.find(s=>s.id===o.semId);
+    const chip = document.createElement('div'); chip.className='conn-chip suggest';
+    chip.title = '클릭하면 연계 추가';
+    chip.textContent = `＋ ${subj?subj.name:'?'} · ${semLabel(sem)} · ${o.title||'(제목없음)'}`;
+    chip.addEventListener('click', ()=>{
+      tempConnections.push(o.id);
+      const input = document.getElementById('connSearchInput');
+      if(input){ input.value=''; }
+      connSearchText='';
+      renderConnList(); renderConnSearchResults();
+    });
+    wrap.appendChild(chip);
   });
 }
 
