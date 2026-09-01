@@ -129,6 +129,8 @@
   .entry-card .tag{font-size:9.5px;color:var(--award);font-weight:700;letter-spacing:.02em; margin-bottom:2px;}
   .entry-card .tag.self-intro-tag{ color:var(--accent-deep); }
   .entry-card .meta-icons{position:absolute; top:8px; right:8px; font-size:10px; color:var(--text-faint);}
+  .entry-card .kw-row{ display:flex; flex-wrap:wrap; gap:3px; margin-top:5px; }
+  .entry-card .kw-chip{ font-size:9.5px; background:var(--accent-soft); color:var(--accent-deep); padding:2px 6px; border-radius:9px; font-weight:600; }
 
   svg.connector-layer{ position:absolute; top:0; left:0; pointer-events:none; z-index:2; }
 
@@ -150,6 +152,8 @@
   .view-empty{ color:var(--text-faint); font-size:13px; font-style:italic; }
   .view-chip-row{ display:flex; flex-wrap:wrap; gap:6px; }
   .view-chip{ font-size:11.5px; background:var(--bg-soft); border:1px solid var(--border); padding:4px 10px; border-radius:12px; color:var(--text-soft); }
+  .view-chip.kw{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent-deep); font-weight:600; cursor:pointer; }
+  .view-chip.kw:hover{ background:var(--accent); color:#fff; }
   .view-file, .view-link{ display:block; font-size:13px; color:var(--accent-deep); text-decoration:none; margin-bottom:4px; }
   .view-file:hover, .view-link:hover{ text-decoration:underline; }
 
@@ -212,6 +216,21 @@
   .conn-search-results{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
   .conn-chip.suggest{ border-style:dashed; color:var(--accent-deep); border-color:var(--accent); background:var(--accent-soft); }
   .conn-empty{ color:var(--text-faint); font-size:12px; padding:6px 2px; }
+
+  /* 키워드 */
+  .kw-input-row{ display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
+  .kw-input-row input[type=text]{ flex:1; min-width:140px; padding:7px 10px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:12.5px; }
+  .kw-suggest-results{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .kw-chip-edit{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; background:var(--accent-soft); color:var(--accent-deep); border:1px solid var(--accent); padding:4px 6px 4px 10px; border-radius:14px; font-weight:600; }
+  .kw-chip-edit button{ background:none; border:none; color:var(--accent-deep); cursor:pointer; font-size:12px; padding:0 2px; }
+  .kw-cloud{ display:flex; flex-wrap:wrap; gap:8px; }
+  .kw-cloud-item{ display:flex; align-items:center; gap:6px; background:var(--bg-soft); border:1px solid var(--border); border-radius:20px; padding:8px 14px; cursor:pointer; font-size:13px; font-weight:600; color:var(--text); }
+  .kw-cloud-item:hover{ border-color:var(--accent); color:var(--accent-deep); background:var(--accent-soft); }
+  .kw-cloud-item .cnt{ font-size:11px; background:var(--text); color:#fff; border-radius:10px; padding:1px 7px; font-weight:700; }
+  .kw-cloud-item:hover .cnt{ background:var(--accent-deep); }
+  .kw-back-row{ display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+  .kw-back-row .btn{ padding:6px 11px; font-size:12px; }
+  .kw-detail-title{ font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px; }
 </style>
 </head>
 <body>
@@ -252,6 +271,7 @@
           <div class="menu-sep"></div>
           <button class="menu-item" id="viewAwardsBtn">🏅 수상 기록만 보기</button>
           <button class="menu-item" id="viewSelfIntroBtn">📝 자소서 자료함</button>
+          <button class="menu-item" id="viewKeywordsBtn">🏷️ 키워드별로 모아보기</button>
           <div class="menu-sep"></div>
           <button class="menu-item" id="goAdmissionsBtn">🎓 대입 전형 정리표 열기</button>
           <button class="menu-item" id="goMainBtn">🏠 메인 사이트로</button>
@@ -267,6 +287,7 @@
       <button class="btn primary" id="addSubjectBtn">＋ 과목 추가</button>
       <button class="btn" id="editModeBtn">🔒 보기 모드</button>
       <button class="btn" id="viewAwardsBtn2">🏅 수상 기록</button>
+      <button class="btn" id="viewKeywordsBtn2">🏷️ 키워드</button>
     </div>
     <div class="savebar">
       <span class="pill" id="saveTimestamp">저장 기록 없음</span>
@@ -314,15 +335,27 @@ const SEMESTERS = [
 const STORAGE_KEY = 'saenggibu_ledger_v1';
 let state = loadLocal() || { subjects: [], entries: {}, lastSaved:null };
 let editingEntryId = null, editingContext = null, modalMode = 'view'; // 'view' | 'edit'
-let tempFiles = [], tempLinks = [], tempConnections = [];
+let tempFiles = [], tempLinks = [], tempConnections = [], tempKeywords = [];
 let editMode = false; // 보기모드(기본) / 편집모드 - 활동추가 칸 표시 여부
 let dragSubjectId = null;
 let connSearchText = '';
+let kwSearchText = '';
 
 function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
 function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function semLabel(sem){ return sem ? `${sem.label} ${sem.sub}` : ''; }
 function stripHtml(html){ const d = document.createElement('div'); d.innerHTML = html||''; return d.textContent || d.innerText || ''; }
+function normKeyword(k){ return (k||'').trim().replace(/^#/,''); }
+function allKeywords(){
+  const set = new Set();
+  Object.values(state.entries).forEach(e=> (e.keywords||[]).forEach(k=> set.add(k)));
+  return Array.from(set).sort((a,b)=> a.localeCompare(b,'ko'));
+}
+function keywordCounts(){
+  const counts = {};
+  Object.values(state.entries).forEach(e=> (e.keywords||[]).forEach(k=>{ counts[k] = (counts[k]||0)+1; }));
+  return counts;
+}
 
 /* ---------- Firebase ---------- */
 let fbAuth=null, fbDb=null, currentUser=null, cloudReady=false;
@@ -560,11 +593,14 @@ function renderBody(){
         let icons = '';
         if(entry.files && entry.files.length) icons += '📎';
         if(entry.links && entry.links.length) icons += '🔗';
+        const kwRow = (entry.keywords && entry.keywords.length)
+          ? `<div class="kw-row">${entry.keywords.slice(0,4).map(k=>`<span class="kw-chip">#${escapeHtml(k)}</span>`).join('')}${entry.keywords.length>4?`<span class="kw-chip">+${entry.keywords.length-4}</span>`:''}</div>` : '';
         card.innerHTML = `<div class="meta-icons">${icons}</div>
           ${entry.award ? `<div class="tag">🏅 수상</div>` : ''}
           ${entry.selfIntro ? `<div class="tag self-intro-tag">📝 자소서 예정</div>` : ''}
           <div class="t">${escapeHtml(entry.title || '(제목 없음)')}</div>
-          <div class="snippet">${escapeHtml(stripHtml(entry.content || ''))}</div>`;
+          <div class="snippet">${escapeHtml(stripHtml(entry.content || ''))}</div>
+          ${kwRow}`;
         card.addEventListener('click', ()=> openModal(entry.id, null, 'view'));
         td.appendChild(card);
       });
@@ -640,6 +676,13 @@ function renderViewMode(){
     </div>
 
     <div class="view-section">
+      <div class="label">키워드</div>
+      <div class="view-chip-row" id="viewKwRow">
+        ${ (entry.keywords&&entry.keywords.length) ? entry.keywords.map(k=>`<span class="view-chip kw" data-kw="${escapeHtml(k)}">#${escapeHtml(k)}</span>`).join('') : '<span class="view-empty">등록된 키워드가 없습니다.</span>' }
+      </div>
+    </div>
+
+    <div class="view-section">
       <div class="label">첨부 파일</div>
       ${ (entry.files&&entry.files.length) ? entry.files.map(f=>`<a class="view-file" href="${f.dataUrl}" target="_blank" rel="noopener">📎 ${escapeHtml(f.name)}</a>`).join('') : '<span class="view-empty">없음</span>' }
     </div>
@@ -672,6 +715,10 @@ function renderViewMode(){
   `;
   document.getElementById('vCloseBtn').addEventListener('click', closeModal);
   document.getElementById('vEditBtn').addEventListener('click', ()=>{ modalMode='edit'; renderEditMode(); });
+  const kwRow = document.getElementById('viewKwRow');
+  if(kwRow) kwRow.querySelectorAll('.view-chip.kw').forEach(chip=>{
+    chip.addEventListener('click', ()=> openKeywordDetail(chip.dataset.kw));
+  });
   document.getElementById('vDupBtn').addEventListener('click', ()=>{
     const orig = state.entries[editingEntryId];
     const newId = uid('entry');
@@ -680,6 +727,7 @@ function renderViewMode(){
       title: (orig.title||'') + ' - 세부활동',
       files: (orig.files||[]).slice(),
       links: (orig.links||[]).slice(),
+      keywords: (orig.keywords||[]).slice(),
       connections: []
     };
     persist(); render();
@@ -699,13 +747,14 @@ function renderEditMode(){
   let entry;
   const isNew = !editingEntryId;
   if(!isNew){ entry = state.entries[editingEntryId]; }
-  else{ entry = {title:'',content:'',award:false,awardName:'',files:[],links:[],memo:'',connections:[],selfIntro:false}; }
+  else{ entry = {title:'',content:'',award:false,awardName:'',files:[],links:[],memo:'',connections:[],selfIntro:false,keywords:[]}; }
 
   const subjId = isNew ? editingContext.subjectId : entry.subjectId;
   const semId = isNew ? editingContext.semId : entry.semId;
   const subj = state.subjects.find(s=>s.id===subjId), sem = SEMESTERS.find(s=>s.id===semId);
 
   tempFiles = (entry.files||[]).slice(); tempLinks = (entry.links||[]).slice(); tempConnections = (entry.connections||[]).slice();
+  tempKeywords = (entry.keywords||[]).slice();
 
   connSearchText = '';
 
@@ -734,6 +783,16 @@ function renderEditMode(){
     <div class="field checkline"><input type="checkbox" id="f_selfintro" ${entry.selfIntro?'checked':''}><label for="f_selfintro" style="margin:0;">자기소개서에 활용할 예정입니다</label></div>
     <div class="field"><label>메모 (추가로 공부할 내용 / 자소서 활용 여부 / 다음 학기 연결점)</label>
       <textarea id="f_memo" placeholder="예: 3학년 세특과 연결 가능 / 자소서 2번 문항에 활용 예정">${escapeHtml(entry.memo||'')}</textarea></div>
+    <div class="field">
+      <label>키워드 (생기부 핵심 키워드로 태그를 달아두면 자소서 쓸 때 모아보기 편해요)</label>
+      <div class="kw-input-row">
+        <input type="text" id="kwInput" placeholder="키워드 입력 후 Enter 또는 쉼표(,)로 추가 (예: 탐구력, 리더십, 환경문제)">
+        <button class="btn" id="kwAddBtn" type="button">+ 추가</button>
+      </div>
+      <div class="kw-suggest-results" id="kwSuggestResults"></div>
+      <div class="conn-list" id="kwList"></div>
+      <small class="hint">이미 사용한 키워드는 입력창에 타이핑하면 추천으로 나타납니다. 클릭하면 바로 추가돼요.</small>
+    </div>
     <div class="field">
       <label>사진 / 보고서 파일 첨부</label>
       <input type="file" id="f_file" multiple>
@@ -766,7 +825,7 @@ function renderEditMode(){
     </div>
   `;
 
-  renderFileList(); renderLinkList(); renderConnList(); renderConnSearchResults();
+  renderFileList(); renderLinkList(); renderConnList(); renderConnSearchResults(); renderKwList(); renderKwSuggest();
 
   const contentBox = document.getElementById('f_content');
   function applyHighlight(color){
@@ -800,6 +859,24 @@ function renderEditMode(){
     const url = urlInput.value.trim(), desc = descInput.value.trim();
     if(url){ tempLinks.push({url, desc}); urlInput.value=''; descInput.value=''; renderLinkList(); }
   });
+
+  /* 키워드 입력 처리 */
+  const kwInput = document.getElementById('kwInput');
+  function addKeywordFromInput(){
+    const raw = kwInput.value;
+    raw.split(',').forEach(part=>{
+      const k = normKeyword(part);
+      if(k && !tempKeywords.includes(k)) tempKeywords.push(k);
+    });
+    kwInput.value = '';
+    renderKwList(); renderKwSuggest();
+  }
+  document.getElementById('kwAddBtn').addEventListener('click', addKeywordFromInput);
+  kwInput.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter' || e.key===','){ e.preventDefault(); addKeywordFromInput(); }
+  });
+  kwInput.addEventListener('input', renderKwSuggest);
+
   document.getElementById('connSearchInput').addEventListener('input', (e)=>{ connSearchText = e.target.value; renderConnSearchResults(); });
   document.getElementById('eCancelBtn').addEventListener('click', ()=>{
     if(isNew) closeModal(); else { modalMode='view'; renderViewMode(); }
@@ -822,7 +899,7 @@ function renderEditMode(){
     if(id){ sId = state.entries[id].subjectId; seId = state.entries[id].semId; }
     else{ id = uid('entry'); sId = editingContext.subjectId; seId = editingContext.semId; }
     try{
-      state.entries[id] = { id, subjectId:sId, semId:seId, title, content, award, awardName, selfIntro, memo, files:tempFiles, links:tempLinks, connections:tempConnections };
+      state.entries[id] = { id, subjectId:sId, semId:seId, title, content, award, awardName, selfIntro, memo, files:tempFiles, links:tempLinks, connections:tempConnections, keywords:tempKeywords };
       tempConnections.forEach(otherId=>{ const other=state.entries[otherId]; if(other && !other.connections.includes(id)) other.connections.push(id); });
       Object.values(state.entries).forEach(e=>{ if(e.id===id) return; if(e.connections.includes(id) && !tempConnections.includes(e.id)) e.connections = e.connections.filter(x=>x!==id); });
       persist();
@@ -895,6 +972,36 @@ function renderConnSearchResults(){
       if(input){ input.value=''; }
       connSearchText='';
       renderConnList(); renderConnSearchResults();
+    });
+    wrap.appendChild(chip);
+  });
+}
+
+/* ---------- 키워드 입력 UI ---------- */
+function renderKwList(){
+  const list = document.getElementById('kwList'); if(!list) return; list.innerHTML='';
+  if(tempKeywords.length===0){ list.innerHTML = '<div class="conn-empty">아직 등록된 키워드가 없습니다.</div>'; return; }
+  tempKeywords.forEach((k, idx)=>{
+    const chip = document.createElement('span'); chip.className='kw-chip-edit';
+    chip.innerHTML = `#${escapeHtml(k)} <button type="button" title="삭제">✕</button>`;
+    chip.querySelector('button').addEventListener('click', ()=>{ tempKeywords.splice(idx,1); renderKwList(); renderKwSuggest(); });
+    list.appendChild(chip);
+  });
+}
+function renderKwSuggest(){
+  const wrap = document.getElementById('kwSuggestResults'); if(!wrap) return;
+  const inputEl = document.getElementById('kwInput');
+  const q = inputEl ? normKeyword(inputEl.value).toLowerCase() : '';
+  wrap.innerHTML = '';
+  if(!q) return;
+  const matches = allKeywords().filter(k=> k.toLowerCase().includes(q) && !tempKeywords.includes(k)).slice(0, 8);
+  if(matches.length===0){ wrap.innerHTML = '<div class="conn-empty">일치하는 기존 키워드가 없습니다. Enter로 새 키워드를 추가하세요.</div>'; return; }
+  matches.forEach(k=>{
+    const chip = document.createElement('div'); chip.className='conn-chip suggest';
+    chip.textContent = `＋ #${k}`;
+    chip.addEventListener('click', ()=>{
+      tempKeywords.push(k);
+      inputEl.value=''; renderKwList(); renderKwSuggest();
     });
     wrap.appendChild(chip);
   });
@@ -976,6 +1083,71 @@ function openSelfIntroRoster(){
 }
 document.getElementById('viewSelfIntroBtn').addEventListener('click', ()=>{ menuDropdown.classList.remove('open'); openSelfIntroRoster(); });
 
+/* ---------- 키워드별로 모아보기 ---------- */
+function openKeywordRoster(){
+  const counts = keywordCounts();
+  const keywords = Object.keys(counts).sort((a,b)=> counts[b]-counts[a] || a.localeCompare(b,'ko'));
+  const modal = document.getElementById('modalBody');
+  document.getElementById('modalBackdrop').classList.add('open');
+  modal.classList.add('wide');
+  modal.innerHTML = `
+    <h2>🏷️ 키워드별로 모아보기</h2>
+    <div class="sub">활동에 달아둔 키워드를 기준으로 모아볼 수 있습니다. 자소서 문항별 소재를 찾을 때 활용해보세요.</div>
+    <div class="kw-input-row">
+      <input type="text" id="kwRosterSearch" placeholder="키워드 검색...">
+    </div>
+    <div id="kwRosterBody"></div>
+    <div class="modal-actions"><div></div><div class="left"><button class="btn" id="rosterCloseBtn">닫기</button></div></div>
+  `;
+  document.getElementById('rosterCloseBtn').addEventListener('click', closeModal);
+
+  function renderCloud(){
+    const q = (document.getElementById('kwRosterSearch').value||'').trim().toLowerCase();
+    const filtered = keywords.filter(k=> k.toLowerCase().includes(q));
+    const body = document.getElementById('kwRosterBody');
+    if(filtered.length===0){
+      body.innerHTML = '<div class="empty-note">아직 등록된 키워드가 없습니다. 활동 편집 화면에서 키워드를 추가해보세요.</div>';
+      return;
+    }
+    body.innerHTML = `<div class="kw-cloud">${filtered.map(k=>`<div class="kw-cloud-item" data-kw="${escapeHtml(k)}">#${escapeHtml(k)} <span class="cnt">${counts[k]}</span></div>`).join('')}</div>`;
+    body.querySelectorAll('.kw-cloud-item').forEach(el=>{
+      el.addEventListener('click', ()=> openKeywordDetail(el.dataset.kw));
+    });
+  }
+  document.getElementById('kwRosterSearch').addEventListener('input', renderCloud);
+  renderCloud();
+}
+function openKeywordDetail(keyword){
+  const items = Object.values(state.entries).filter(e=> (e.keywords||[]).includes(keyword));
+  const modal = document.getElementById('modalBody');
+  document.getElementById('modalBackdrop').classList.add('open');
+  modal.classList.add('wide');
+  modal.innerHTML = `
+    <div class="kw-back-row"><button class="btn" id="kwBackBtn">← 전체 키워드로</button></div>
+    <div class="kw-detail-title">🏷️ #${escapeHtml(keyword)} <span class="pill" style="background:var(--accent-soft); color:var(--accent-deep); border:1px solid var(--border); padding:4px 10px; border-radius:12px; font-size:12px;">총 ${items.length}건</span></div>
+    <div class="sub">이 키워드가 달린 활동들입니다. 자소서 문항에 맞는 소재를 여기서 모아 정리해보세요.</div>
+    <div class="roster-list" id="kwDetailList"></div>
+    <div class="modal-actions"><div></div><div class="left"><button class="btn" id="rosterCloseBtn">닫기</button></div></div>
+  `;
+  document.getElementById('rosterCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('kwBackBtn').addEventListener('click', ()=>{ modal.classList.remove('wide'); openKeywordRoster(); });
+  const list = document.getElementById('kwDetailList');
+  if(items.length===0){ list.innerHTML = '<div class="empty-note">이 키워드가 달린 활동이 없습니다.</div>'; }
+  items.forEach(entry=>{
+    const subj = state.subjects.find(s=>s.id===entry.subjectId), sem = SEMESTERS.find(s=>s.id===entry.semId);
+    const row = document.createElement('div'); row.className='roster-item';
+    row.innerHTML = `<div class="rt">
+        <div class="title">${entry.award?'🏅 ':''}${escapeHtml(entry.title||'(제목없음)')}</div>
+        <div class="meta">${subj?escapeHtml(subj.name):'?'} · ${semLabel(sem)}</div>
+        <div class="snippet">${escapeHtml(stripHtml(entry.content||''))}</div>
+      </div>`;
+    row.addEventListener('click', ()=>{ modal.classList.remove('wide'); openModal(entry.id, null, 'view'); });
+    list.appendChild(row);
+  });
+}
+document.getElementById('viewKeywordsBtn').addEventListener('click', ()=>{ menuDropdown.classList.remove('open'); openKeywordRoster(); });
+document.getElementById('viewKeywordsBtn2').addEventListener('click', openKeywordRoster);
+
 /* 과목/학기를 먼저 고른 뒤 새 활동(수상 등) 입력으로 이동 */
 function openNewTaggedEntry(preset){
   if(state.subjects.length===0){ alert('먼저 과목을 추가해주세요.'); return; }
@@ -1029,10 +1201,10 @@ function loadSample(){
   if(state.subjects.length > 0 && !confirm('현재 데이터가 있습니다. 예시 데이터로 덮어쓸까요?')) { menuDropdown.classList.remove('open'); return; }
   const s1={id:uid('subj'),name:'통합과학',collapsed:false}, s2={id:uid('subj'),name:'화법과 작문',collapsed:false}, s3={id:uid('subj'),name:'한국사',collapsed:false};
   state.subjects=[s1,s2,s3]; state.entries={};
-  const e1={id:uid('entry'),subjectId:s1.id,semId:'g1-1',title:'교내 과학탐구발표대회 참가',content:'대기 중 미세먼지 농도와 호흡기 질환의 상관관계를 주제로 조사, 발표함.',award:true,awardName:'우수상',selfIntro:true,memo:'2학년 화학 세특과 연결 가능. 자소서 1번에 활용 예정.',files:[],links:[{url:'https://www.narastat.kr'}],connections:[]};
-  const e2={id:uid('entry'),subjectId:s1.id,semId:'g2-1',title:'화학 심화 탐구보고서 - 대기오염물질 분석',content:'1학년 탐구를 심화하여 대기오염물질 종류별 화학적 특성을 분석함.',award:false,awardName:'',selfIntro:false,memo:'3학년 화학II와 연계 예정.',files:[],links:[],connections:[]};
-  const e3={id:uid('entry'),subjectId:s2.id,semId:'g1-2',title:'토론 동아리 - 환경정책 찬반토론',content:'탄소배출권 거래제 도입에 대한 찬반토론에서 반대 측 입론을 맡음.',award:false,awardName:'',selfIntro:true,memo:'과학탐구 주제와 연결지어 자소서에 활용 가능',files:[],links:[],connections:[]};
-  const e4={id:uid('entry'),subjectId:s3.id,semId:'g2-2',title:'한국 근현대사 프로젝트 발표',content:'일제강점기 경제수탈 정책을 주제로 발표자료 제작 및 발표 진행.',award:false,awardName:'',selfIntro:false,memo:'',files:[],links:[],connections:[]};
+  const e1={id:uid('entry'),subjectId:s1.id,semId:'g1-1',title:'교내 과학탐구발표대회 참가',content:'대기 중 미세먼지 농도와 호흡기 질환의 상관관계를 주제로 조사, 발표함.',award:true,awardName:'우수상',selfIntro:true,memo:'2학년 화학 세특과 연결 가능. 자소서 1번에 활용 예정.',files:[],links:[{url:'https://www.narastat.kr'}],connections:[],keywords:['탐구력','환경문제','과학적사고']};
+  const e2={id:uid('entry'),subjectId:s1.id,semId:'g2-1',title:'화학 심화 탐구보고서 - 대기오염물질 분석',content:'1학년 탐구를 심화하여 대기오염물질 종류별 화학적 특성을 분석함.',award:false,awardName:'',selfIntro:false,memo:'3학년 화학II와 연계 예정.',files:[],links:[],connections:[],keywords:['탐구력','환경문제','심화학습']};
+  const e3={id:uid('entry'),subjectId:s2.id,semId:'g1-2',title:'토론 동아리 - 환경정책 찬반토론',content:'탄소배출권 거래제 도입에 대한 찬반토론에서 반대 측 입론을 맡음.',award:false,awardName:'',selfIntro:true,memo:'과학탐구 주제와 연결지어 자소서에 활용 가능',files:[],links:[],connections:[],keywords:['환경문제','논리적사고','리더십']};
+  const e4={id:uid('entry'),subjectId:s3.id,semId:'g2-2',title:'한국 근현대사 프로젝트 발표',content:'일제강점기 경제수탈 정책을 주제로 발표자료 제작 및 발표 진행.',award:false,awardName:'',selfIntro:false,memo:'',files:[],links:[],connections:[],keywords:['역사의식','발표력']};
   [e1,e2,e3,e4].forEach(e=> state.entries[e.id]=e);
   e1.connections=[e2.id,e3.id]; e2.connections=[e1.id]; e3.connections=[e1.id];
   persist(); render(); menuDropdown.classList.remove('open');
