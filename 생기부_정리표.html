@@ -146,6 +146,8 @@
   .view-title{ font-size:20px; font-weight:700; margin-bottom:4px; }
   .view-badge{ display:inline-block; font-size:11px; font-weight:700; color:var(--award); background:var(--award-soft); padding:3px 9px; border-radius:12px; margin-bottom:10px; }
   .view-badge.self-intro{ color:var(--accent-deep); background:var(--accent-soft); margin-left:6px; }
+  .view-badge.kw{ cursor:pointer; }
+  .view-badge.kw:hover{ background:var(--award); color:#fff; }
   .view-section{ margin-bottom:16px; }
   .view-section .label{ font-size:11px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:.03em; margin-bottom:5px; }
   .view-content{ font-size:14px; line-height:1.6; color:var(--text); white-space:pre-wrap; }
@@ -272,6 +274,7 @@
           <input type="file" id="importInput" class="menu-hidden-input" accept="application/json">
           <div class="menu-sep"></div>
           <button class="menu-item" id="viewAwardsBtn">🏅 수상 기록만 보기</button>
+          <button class="menu-item" id="viewAwardGroupsBtn">🏆 수상기록 묶어서 보기</button>
           <button class="menu-item" id="viewSelfIntroBtn">📝 자소서 자료함</button>
           <button class="menu-item" id="viewKeywordsBtn">🏷️ 키워드별로 모아보기</button>
           <div class="menu-sep"></div>
@@ -289,6 +292,7 @@
       <button class="btn primary" id="addSubjectBtn">＋ 과목 추가</button>
       <button class="btn" id="editModeBtn">🔒 보기 모드</button>
       <button class="btn" id="viewAwardsBtn2">🏅 수상 기록</button>
+      <button class="btn" id="viewAwardGroupsBtn2">🏆 수상묶음</button>
       <button class="btn" id="viewKeywordsBtn2">🏷️ 키워드</button>
     </div>
     <div class="savebar">
@@ -356,6 +360,20 @@ function allKeywords(){
 function keywordCounts(){
   const counts = {};
   Object.values(state.entries).forEach(e=> (e.keywords||[]).forEach(k=>{ counts[k] = (counts[k]||0)+1; }));
+  return counts;
+}
+function allAwardNames(){
+  const set = new Set();
+  Object.values(state.entries).forEach(e=>{ if(e.award && e.awardName && e.awardName.trim()) set.add(e.awardName.trim()); });
+  return Array.from(set).sort((a,b)=> a.localeCompare(b,'ko'));
+}
+function awardGroupCounts(){
+  const counts = {};
+  Object.values(state.entries).forEach(e=>{
+    if(!e.award) return;
+    const key = (e.awardName && e.awardName.trim()) ? e.awardName.trim() : '(수상명 미입력)';
+    counts[key] = (counts[key]||0)+1;
+  });
   return counts;
 }
 
@@ -668,7 +686,7 @@ function renderViewMode(){
   const modal = document.getElementById('modalBody');
   modal.innerHTML = `
     <div class="sub">${subj?subj.name:''} · ${semLabel(sem)}</div>
-    ${entry.award ? `<div class="view-badge">🏅 수상 ${entry.awardName?('· '+escapeHtml(entry.awardName)):''}</div>` : ''}
+    ${entry.award ? `<div class="view-badge${entry.awardName?' kw':''}" ${entry.awardName?`id="viewAwardBadge" data-award="${escapeHtml(entry.awardName.trim())}" title="클릭하면 같은 수상명끼리 모아보기"`:''}>🏅 수상 ${entry.awardName?('· '+escapeHtml(entry.awardName)):''}</div>` : ''}
     ${entry.selfIntro ? `<div class="view-badge self-intro">📝 자소서 활용 예정</div>` : ''}
     <div class="view-title">${escapeHtml(entry.title||'(제목 없음)')}</div>
 
@@ -721,6 +739,8 @@ function renderViewMode(){
   if(kwRow) kwRow.querySelectorAll('.view-chip.kw').forEach(chip=>{
     chip.addEventListener('click', ()=> openKeywordDetail(chip.dataset.kw));
   });
+  const awardBadge = document.getElementById('viewAwardBadge');
+  if(awardBadge) awardBadge.addEventListener('click', ()=>{ modal.classList.remove('wide'); openAwardGroupRoster(awardBadge.dataset.award); });
   document.getElementById('vDupBtn').addEventListener('click', ()=>{
     const orig = state.entries[editingEntryId];
     const newId = uid('entry');
@@ -780,8 +800,12 @@ function renderEditMode(){
     </div>
     <div class="row2">
       <div class="field checkline" style="margin-bottom:0;"><input type="checkbox" id="f_award" ${entry.award?'checked':''}><label for="f_award" style="margin:0;">수상 기록입니다</label></div>
-      <div class="field" style="margin-bottom:0;"><input type="text" id="f_awardname" placeholder="수상명 (해당 시)" value="${escapeHtml(entry.awardName||'')}"></div>
+      <div class="field" style="margin-bottom:0;">
+        <input type="text" id="f_awardname" placeholder="수상명 (해당 시)" value="${escapeHtml(entry.awardName||'')}" autocomplete="off">
+        <div class="kw-suggest-results" id="awardSuggestResults" style="margin-top:6px;"></div>
+      </div>
     </div>
+    <small class="hint" style="display:block; margin-top:-8px; margin-bottom:14px;">같은 수상이 여러 생기부(과목·학기)에 나눠 적혀 있다면, 수상명을 똑같이 입력해두세요. 메뉴의 "수상기록 묶어서 보기"에서 한데 모아 확인할 수 있어요.</small>
     <div class="field checkline"><input type="checkbox" id="f_selfintro" ${entry.selfIntro?'checked':''}><label for="f_selfintro" style="margin:0;">자기소개서에 활용할 예정입니다</label></div>
     <div class="field"><label>메모 (추가로 공부할 내용 / 자소서 활용 여부 / 다음 학기 연결점)</label>
       <textarea id="f_memo" placeholder="예: 3학년 세특과 연결 가능 / 자소서 2번 문항에 활용 예정">${escapeHtml(entry.memo||'')}</textarea></div>
@@ -894,6 +918,27 @@ function renderEditMode(){
     if(e.key==='Enter' || e.key===','){ e.preventDefault(); addKeywordFromInput(); }
   });
   kwInput.addEventListener('input', renderKwSuggest);
+
+  /* 수상명 자동완성: 기존에 쓴 수상명과 동일하게 입력하도록 도와서, 같은 수상이 여러 생기부에
+     나뉘어 적혀 있어도 정확히 같은 이름으로 묶일 수 있게 합니다. */
+  const awardNameInput = document.getElementById('f_awardname');
+  function renderAwardSuggest(){
+    const wrap = document.getElementById('awardSuggestResults'); if(!wrap) return;
+    const q = awardNameInput.value.trim().toLowerCase();
+    wrap.innerHTML = '';
+    if(!q) return;
+    const names = allAwardNames().filter(n=> n.toLowerCase().includes(q) && n.toLowerCase() !== q).slice(0, 6);
+    if(names.length===0) return;
+    names.forEach(n=>{
+      const chip = document.createElement('div'); chip.className='conn-chip suggest';
+      chip.textContent = `🏅 ${n}`;
+      chip.addEventListener('click', ()=>{ awardNameInput.value = n; wrap.innerHTML=''; });
+      wrap.appendChild(chip);
+    });
+  }
+  awardNameInput.addEventListener('input', renderAwardSuggest);
+  awardNameInput.addEventListener('focus', renderAwardSuggest);
+
 
   document.getElementById('connSearchInput').addEventListener('input', (e)=>{ connSearchText = e.target.value; renderConnSearchResults(); });
   document.getElementById('eCancelBtn').addEventListener('click', ()=>{
@@ -1061,6 +1106,81 @@ function openAwardsRoster(){
 }
 document.getElementById('viewAwardsBtn').addEventListener('click', ()=>{ menuDropdown.classList.remove('open'); openAwardsRoster(); });
 document.getElementById('viewAwardsBtn2').addEventListener('click', openAwardsRoster);
+
+/* ---------- 수상기록 묶어서 보기 (같은 수상명끼리 그룹) ---------- */
+function openAwardGroupRoster(presetName){
+  const counts = awardGroupCounts();
+  const names = Object.keys(counts).sort((a,b)=> counts[b]-counts[a] || a.localeCompare(b,'ko'));
+  const modal = document.getElementById('modalBody');
+  document.getElementById('modalBackdrop').classList.add('open');
+  modal.classList.add('wide');
+  modal.innerHTML = `
+    <h2>🏆 수상기록 묶어서 보기</h2>
+    <div class="sub">같은 수상이 여러 과목·학기의 생기부에 나뉘어 적혀 있을 때, 수상명이 같은 기록끼리 모아봅니다.</div>
+    <div class="kw-input-row">
+      <input type="text" id="awardRosterSearch" placeholder="수상명 검색...">
+    </div>
+    <div id="awardRosterBody"></div>
+    <div id="awardResultWrap"></div>
+    <div class="modal-actions"><div></div><div class="left"><button class="btn" id="rosterCloseBtn">닫기</button></div></div>
+  `;
+  document.getElementById('rosterCloseBtn').addEventListener('click', closeModal);
+
+  let selectedName = presetName || null;
+
+  function renderCloud(){
+    const q = (document.getElementById('awardRosterSearch').value||'').trim().toLowerCase();
+    const filtered = names.filter(n=> n.toLowerCase().includes(q));
+    const body = document.getElementById('awardRosterBody');
+    if(filtered.length===0){
+      body.innerHTML = '<div class="empty-note">아직 수상으로 표시된 활동이 없습니다. 활동 편집 화면에서 "수상 기록입니다"를 체크해보세요.</div>';
+      return;
+    }
+    body.innerHTML = `<div class="kw-cloud">${filtered.map(n=>`<div class="kw-cloud-item${selectedName===n?' selected':''}" data-name="${escapeHtml(n)}">🏅 ${escapeHtml(n)} <span class="cnt">${counts[n]}</span></div>`).join('')}</div>`;
+    body.querySelectorAll('.kw-cloud-item').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const n = el.dataset.name;
+        selectedName = (selectedName===n) ? null : n;
+        renderCloud(); renderResults();
+      });
+    });
+  }
+
+  function renderResults(){
+    const wrap = document.getElementById('awardResultWrap');
+    if(!selectedName){ wrap.innerHTML = ''; return; }
+    const items = Object.values(state.entries).filter(e=>{
+      if(!e.award) return false;
+      const key = (e.awardName && e.awardName.trim()) ? e.awardName.trim() : '(수상명 미입력)';
+      return key === selectedName;
+    });
+    wrap.innerHTML = `
+      <div class="kw-detail-title" style="margin-top:16px;">🏆 ${escapeHtml(selectedName)}
+        <span class="pill" style="background:var(--award-soft); color:var(--award); border:1px solid #f3c9c5; padding:4px 10px; border-radius:12px; font-size:12px;">총 ${items.length}건</span>
+      </div>
+      ${items.length>1 ? `<div class="sub" style="margin-top:6px;">같은 수상이 ${items.length}개의 생기부 항목에 나뉘어 적혀 있습니다. 자소서에서는 이 기록들을 하나의 스토리로 엮어 정리해보세요.</div>` : ''}
+      <div class="roster-list" id="awardDetailList" style="margin-top:10px;"></div>
+    `;
+    const list = document.getElementById('awardDetailList');
+    if(items.length===0){ list.innerHTML = '<div class="empty-note">해당 수상 기록이 없습니다.</div>'; return; }
+    items.forEach(entry=>{
+      const subj = state.subjects.find(s=>s.id===entry.subjectId), sem = SEMESTERS.find(s=>s.id===entry.semId);
+      const row = document.createElement('div'); row.className='roster-item';
+      row.innerHTML = `<div class="rt">
+          <div class="title">🏅 ${escapeHtml(entry.title||'(제목없음)')}</div>
+          <div class="meta">${subj?escapeHtml(subj.name):'?'} · ${semLabel(sem)}</div>
+          <div class="snippet">${escapeHtml(stripHtml(entry.content||''))}</div>
+        </div>`;
+      row.addEventListener('click', ()=>{ modal.classList.remove('wide'); openModal(entry.id, null, 'view'); });
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById('awardRosterSearch').addEventListener('input', renderCloud);
+  renderCloud(); renderResults();
+}
+document.getElementById('viewAwardGroupsBtn').addEventListener('click', ()=>{ menuDropdown.classList.remove('open'); openAwardGroupRoster(); });
+document.getElementById('viewAwardGroupsBtn2').addEventListener('click', ()=> openAwardGroupRoster());
 
 /* ---------- 자소서 자료함 ---------- */
 function openSelfIntroRoster(){
@@ -1247,8 +1367,9 @@ function loadSample(){
   const e2={id:uid('entry'),subjectId:s1.id,semId:'g2-1',title:'화학 심화 탐구보고서 - 대기오염물질 분석',content:'1학년 탐구를 심화하여 대기오염물질 종류별 화학적 특성을 분석함.',award:false,awardName:'',selfIntro:false,memo:'3학년 화학II와 연계 예정.',files:[],links:[],connections:[],keywords:['탐구력','환경문제','심화학습']};
   const e3={id:uid('entry'),subjectId:s2.id,semId:'g1-2',title:'토론 동아리 - 환경정책 찬반토론',content:'탄소배출권 거래제 도입에 대한 찬반토론에서 반대 측 입론을 맡음.',award:false,awardName:'',selfIntro:true,memo:'과학탐구 주제와 연결지어 자소서에 활용 가능',files:[],links:[],connections:[],keywords:['환경문제','논리적사고','리더십']};
   const e4={id:uid('entry'),subjectId:s3.id,semId:'g2-2',title:'한국 근현대사 프로젝트 발표',content:'일제강점기 경제수탈 정책을 주제로 발표자료 제작 및 발표 진행.',award:false,awardName:'',selfIntro:false,memo:'',files:[],links:[],connections:[],keywords:['역사의식','발표력']};
-  [e1,e2,e3,e4].forEach(e=> state.entries[e.id]=e);
-  e1.connections=[e2.id,e3.id]; e2.connections=[e1.id]; e3.connections=[e1.id];
+  const e5={id:uid('entry'),subjectId:s2.id,semId:'g2-1',title:'교내 학술제 융합보고서 부문',content:'과학탐구 내용을 바탕으로 정책 제안 보고서를 작성해 학술제에 출품함.',award:true,awardName:'우수상',selfIntro:true,memo:'같은 "우수상"이 통합과학(1-1)과 화작(2-1) 두 과목에 나뉘어 기재됨 - 수상기록 묶어서 보기에서 확인 가능.',files:[],links:[],connections:[e1.id],keywords:['탐구력','논리적사고']};
+  [e1,e2,e3,e4,e5].forEach(e=> state.entries[e.id]=e);
+  e1.connections=[e2.id,e3.id,e5.id]; e2.connections=[e1.id]; e3.connections=[e1.id];
   persist(); render(); menuDropdown.classList.remove('open');
 }
 document.getElementById('loadSampleBtn').addEventListener('click', loadSample);
