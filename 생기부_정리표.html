@@ -228,6 +228,8 @@
   .kw-cloud-item:hover{ border-color:var(--accent); color:var(--accent-deep); background:var(--accent-soft); }
   .kw-cloud-item .cnt{ font-size:11px; background:var(--text); color:#fff; border-radius:10px; padding:1px 7px; font-weight:700; }
   .kw-cloud-item:hover .cnt{ background:var(--accent-deep); }
+  .kw-cloud-item.selected{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .kw-cloud-item.selected .cnt{ background:rgba(255,255,255,.3); }
   .kw-back-row{ display:flex; align-items:center; gap:8px; margin-bottom:14px; }
   .kw-back-row .btn{ padding:6px 11px; font-size:12px; }
   .kw-detail-title{ font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px; }
@@ -838,6 +840,22 @@ function renderEditMode(){
   document.getElementById('hlPinkBtn').addEventListener('click', ()=> applyHighlight('#ffd6e7'));
   document.getElementById('hlClearBtn').addEventListener('click', ()=> applyHighlight('transparent'));
   document.getElementById('hlBoldBtn').addEventListener('click', ()=>{ contentBox.focus(); document.execCommand('bold'); });
+  /* 생기부 원문을 워드/한글/나이스 등에서 복사해 붙여넣을 때 밑줄・빨간 맞춤법 표시・이상한 글꼴/색 등
+     원본 서식이 그대로 딸려와 화면이 깨지는 문제를 방지하기 위해, 붙여넣기는 항상 순수 텍스트로 처리합니다. */
+  contentBox.addEventListener('paste', (e)=>{
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    try{ document.execCommand('insertText', false, text); }
+    catch(err){
+      const sel = window.getSelection();
+      if(sel && sel.rangeCount){
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(document.createTextNode(text));
+        range.collapse(false);
+      }
+    }
+  });
   contentBox.addEventListener('keydown', (e)=>{
     if((e.ctrlKey || e.metaKey) && (e.key==='h' || e.key==='H' || e.code==='KeyH')){
       e.preventDefault();
@@ -1083,23 +1101,31 @@ function openSelfIntroRoster(){
 }
 document.getElementById('viewSelfIntroBtn').addEventListener('click', ()=>{ menuDropdown.classList.remove('open'); openSelfIntroRoster(); });
 
-/* ---------- 키워드별로 모아보기 ---------- */
-function openKeywordRoster(){
+/* ---------- 키워드별로 모아보기 (여러 키워드 동시 선택 가능) ---------- */
+let kwSelected = []; // 현재 선택된 키워드들
+let kwMatchMode = 'OR'; // 'OR' = 하나라도 포함, 'AND' = 모두 포함
+
+function openKeywordRoster(presetKeywords){
   const counts = keywordCounts();
   const keywords = Object.keys(counts).sort((a,b)=> counts[b]-counts[a] || a.localeCompare(b,'ko'));
+  kwSelected = presetKeywords ? presetKeywords.slice() : [];
+  kwMatchMode = 'OR';
   const modal = document.getElementById('modalBody');
   document.getElementById('modalBackdrop').classList.add('open');
   modal.classList.add('wide');
   modal.innerHTML = `
     <h2>🏷️ 키워드별로 모아보기</h2>
-    <div class="sub">활동에 달아둔 키워드를 기준으로 모아볼 수 있습니다. 자소서 문항별 소재를 찾을 때 활용해보세요.</div>
+    <div class="sub">키워드를 원하는 만큼 골라보세요. 여러 개를 고르면 "하나라도 포함" 또는 "모두 포함" 기준으로 활동을 모아 보여드립니다.</div>
     <div class="kw-input-row">
       <input type="text" id="kwRosterSearch" placeholder="키워드 검색...">
+      <button class="btn" id="kwClearSelBtn" type="button">선택 해제</button>
     </div>
     <div id="kwRosterBody"></div>
+    <div id="kwResultWrap"></div>
     <div class="modal-actions"><div></div><div class="left"><button class="btn" id="rosterCloseBtn">닫기</button></div></div>
   `;
   document.getElementById('rosterCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('kwClearSelBtn').addEventListener('click', ()=>{ kwSelected=[]; renderCloud(); renderResults(); });
 
   function renderCloud(){
     const q = (document.getElementById('kwRosterSearch').value||'').trim().toLowerCase();
@@ -1109,44 +1135,60 @@ function openKeywordRoster(){
       body.innerHTML = '<div class="empty-note">아직 등록된 키워드가 없습니다. 활동 편집 화면에서 키워드를 추가해보세요.</div>';
       return;
     }
-    body.innerHTML = `<div class="kw-cloud">${filtered.map(k=>`<div class="kw-cloud-item" data-kw="${escapeHtml(k)}">#${escapeHtml(k)} <span class="cnt">${counts[k]}</span></div>`).join('')}</div>`;
+    body.innerHTML = `<div class="kw-cloud">${filtered.map(k=>`<div class="kw-cloud-item${kwSelected.includes(k)?' selected':''}" data-kw="${escapeHtml(k)}">#${escapeHtml(k)} <span class="cnt">${counts[k]}</span></div>`).join('')}</div>`;
     body.querySelectorAll('.kw-cloud-item').forEach(el=>{
-      el.addEventListener('click', ()=> openKeywordDetail(el.dataset.kw));
+      el.addEventListener('click', ()=>{
+        const k = el.dataset.kw;
+        if(kwSelected.includes(k)) kwSelected = kwSelected.filter(x=>x!==k);
+        else kwSelected.push(k);
+        renderCloud(); renderResults();
+      });
     });
   }
+
+  function renderResults(){
+    const wrap = document.getElementById('kwResultWrap');
+    if(kwSelected.length===0){ wrap.innerHTML = ''; return; }
+    const items = Object.values(state.entries).filter(e=>{
+      const eKw = e.keywords||[];
+      return kwMatchMode==='AND' ? kwSelected.every(k=>eKw.includes(k)) : kwSelected.some(k=>eKw.includes(k));
+    });
+    wrap.innerHTML = `
+      <div class="kw-back-row" style="margin-top:16px; justify-content:space-between;">
+        <div class="kw-detail-title">선택한 키워드: ${kwSelected.map(k=>'#'+escapeHtml(k)).join(' ')}</div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn${kwMatchMode==='OR'?' active-toggle':''}" id="kwModeOrBtn" type="button" style="padding:6px 11px; font-size:12px;">하나라도 포함</button>
+          <button class="btn${kwMatchMode==='AND'?' active-toggle':''}" id="kwModeAndBtn" type="button" style="padding:6px 11px; font-size:12px;">모두 포함</button>
+        </div>
+      </div>
+      <span class="pill" style="background:var(--accent-soft); color:var(--accent-deep); border:1px solid var(--border); padding:4px 10px; border-radius:12px; font-size:12px; display:inline-block; margin-bottom:10px;">총 ${items.length}건</span>
+      <div class="roster-list" id="kwDetailList"></div>
+    `;
+    document.getElementById('kwModeOrBtn').addEventListener('click', ()=>{ kwMatchMode='OR'; renderResults(); });
+    document.getElementById('kwModeAndBtn').addEventListener('click', ()=>{ kwMatchMode='AND'; renderResults(); });
+    const list = document.getElementById('kwDetailList');
+    if(items.length===0){ list.innerHTML = '<div class="empty-note">조건에 맞는 활동이 없습니다.</div>'; return; }
+    items.forEach(entry=>{
+      const subj = state.subjects.find(s=>s.id===entry.subjectId), sem = SEMESTERS.find(s=>s.id===entry.semId);
+      const row = document.createElement('div'); row.className='roster-item';
+      row.innerHTML = `<div class="rt">
+          <div class="title">${entry.award?'🏅 ':''}${escapeHtml(entry.title||'(제목없음)')}</div>
+          <div class="meta">${subj?escapeHtml(subj.name):'?'} · ${semLabel(sem)}</div>
+          <div class="snippet">${escapeHtml(stripHtml(entry.content||''))}</div>
+          <div class="kw-row" style="margin-top:6px;">${(entry.keywords||[]).map(k=>`<span class="kw-chip">#${escapeHtml(k)}</span>`).join('')}</div>
+        </div>`;
+      row.addEventListener('click', ()=>{ modal.classList.remove('wide'); openModal(entry.id, null, 'view'); });
+      list.appendChild(row);
+    });
+  }
+
   document.getElementById('kwRosterSearch').addEventListener('input', renderCloud);
-  renderCloud();
+  renderCloud(); renderResults();
 }
-function openKeywordDetail(keyword){
-  const items = Object.values(state.entries).filter(e=> (e.keywords||[]).includes(keyword));
-  const modal = document.getElementById('modalBody');
-  document.getElementById('modalBackdrop').classList.add('open');
-  modal.classList.add('wide');
-  modal.innerHTML = `
-    <div class="kw-back-row"><button class="btn" id="kwBackBtn">← 전체 키워드로</button></div>
-    <div class="kw-detail-title">🏷️ #${escapeHtml(keyword)} <span class="pill" style="background:var(--accent-soft); color:var(--accent-deep); border:1px solid var(--border); padding:4px 10px; border-radius:12px; font-size:12px;">총 ${items.length}건</span></div>
-    <div class="sub">이 키워드가 달린 활동들입니다. 자소서 문항에 맞는 소재를 여기서 모아 정리해보세요.</div>
-    <div class="roster-list" id="kwDetailList"></div>
-    <div class="modal-actions"><div></div><div class="left"><button class="btn" id="rosterCloseBtn">닫기</button></div></div>
-  `;
-  document.getElementById('rosterCloseBtn').addEventListener('click', closeModal);
-  document.getElementById('kwBackBtn').addEventListener('click', ()=>{ modal.classList.remove('wide'); openKeywordRoster(); });
-  const list = document.getElementById('kwDetailList');
-  if(items.length===0){ list.innerHTML = '<div class="empty-note">이 키워드가 달린 활동이 없습니다.</div>'; }
-  items.forEach(entry=>{
-    const subj = state.subjects.find(s=>s.id===entry.subjectId), sem = SEMESTERS.find(s=>s.id===entry.semId);
-    const row = document.createElement('div'); row.className='roster-item';
-    row.innerHTML = `<div class="rt">
-        <div class="title">${entry.award?'🏅 ':''}${escapeHtml(entry.title||'(제목없음)')}</div>
-        <div class="meta">${subj?escapeHtml(subj.name):'?'} · ${semLabel(sem)}</div>
-        <div class="snippet">${escapeHtml(stripHtml(entry.content||''))}</div>
-      </div>`;
-    row.addEventListener('click', ()=>{ modal.classList.remove('wide'); openModal(entry.id, null, 'view'); });
-    list.appendChild(row);
-  });
-}
+/* 활동 상세보기에서 키워드 칩을 클릭했을 때: 그 키워드 하나만 선택된 상태로 모아보기를 엽니다. */
+function openKeywordDetail(keyword){ openKeywordRoster([keyword]); }
 document.getElementById('viewKeywordsBtn').addEventListener('click', ()=>{ menuDropdown.classList.remove('open'); openKeywordRoster(); });
-document.getElementById('viewKeywordsBtn2').addEventListener('click', openKeywordRoster);
+document.getElementById('viewKeywordsBtn2').addEventListener('click', ()=> openKeywordRoster());
 
 /* 과목/학기를 먼저 고른 뒤 새 활동(수상 등) 입력으로 이동 */
 function openNewTaggedEntry(preset){
