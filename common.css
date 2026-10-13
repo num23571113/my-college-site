@@ -1,0 +1,70 @@
+/* ============================================================
+   common.css — 세 페이지(메인 / 생기부 / 대입 전형)가 함께 쓰는 접근성·가독성 레이어
+   각 페이지의 <style> 뒤에 불러오므로, 여기 값이 기존 색·크기를 덮어씁니다.
+   ============================================================ */
+
+/* 1) 글자 대비 개선: 연한 회색 글씨(#9a9a9a, 대비 2.8:1)를 읽기 쉬운 색으로 */
+:root{
+  --text-soft:#555250;
+  --text-faint:#6b6865;
+  --accent-deep:#a14a2e;
+  --focus:#2563eb;
+}
+html[data-theme="dark"]{
+  --text-soft:#c4c1bc;
+  --text-faint:#9d9a94;
+  --accent-deep:#f0a184;
+  --focus:#8ab4ff;
+}
+
+/* 2) 키보드 사용자를 위한 포커스 표시 */
+:focus{ outline:none; }
+:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; border-radius:6px; }
+input:focus-visible, textarea:focus-visible, select:focus-visible{ outline-offset:0; }
+
+/* 3) 본문으로 건너뛰기 링크 */
+.skip-link{
+  position:absolute; left:12px; top:-60px; z-index:100; background:var(--text); color:var(--bg);
+  padding:10px 16px; border-radius:8px; font-weight:700; font-size:14px; text-decoration:none; transition:top .15s;
+}
+.skip-link:focus{ top:12px; }
+.sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+[hidden]{ display:none !important; }
+
+/* 4) 터치하기 쉬운 크기 */
+.btn, .google-btn, .menu-item{ min-height:40px; }
+.menu-btn, .icon-btn{ min-width:40px; min-height:40px; }
+.chip-toggle, .tabs button{ min-height:36px; }
+
+/* 5) 다크모드에서 흰 배경으로 남던 입력창·버튼·모달 정리 */
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] [contenteditable]{
+  background:var(--bg-soft); color:var(--text); border-color:var(--border);
+}
+html[data-theme="dark"] .btn,
+html[data-theme="dark"] .menu-btn,
+html[data-theme="dark"] .modal,
+html[data-theme="dark"] .menu-dropdown,
+html[data-theme="dark"] .google-btn{ background:var(--bg); color:var(--text); border-color:var(--border); }
+html[data-theme="dark"] .btn.primary{ background:var(--accent); color:#1a1a1a; border-color:var(--accent); }
+html[data-theme="dark"] select option{ background:var(--bg); color:var(--text); }
+
+/* 6) 흰 글씨 버튼 대비 확보 (주황 #d97757 위 흰 글씨는 3.1:1로 부족) */
+.btn.primary, .donate-btn, .search-box button{ background:#b5583a; border-color:#b5583a; color:#fff; }
+.btn.primary:hover, .donate-btn:hover, .search-box button:hover{ background:#9a4a2f; border-color:#9a4a2f; }
+html[data-theme="dark"] .donate-btn, html[data-theme="dark"] .search-box button{ background:var(--accent); color:#1a1a1a; }
+
+/* 7) 모션을 줄이고 싶은 사용자 */
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ animation-duration:.001ms !important; animation-delay:0s !important; transition-duration:.001ms !important; }
+  .cover, .section{ opacity:1 !important; transform:none !important; }
+}
+
+/* 8) 작은 화면에서 모달을 화면에 꽉 차게 */
+@media (max-width:640px){
+  .modal-backdrop{ padding:0 !important; align-items:flex-end !important; }
+  .modal{ width:100% !important; max-height:94vh !important; border-radius:16px 16px 0 0 !important; padding:20px 18px !important; }
+  header{ padding-left:14px !important; padding-right:14px !important; }
+}
